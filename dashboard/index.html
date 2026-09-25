@@ -1,0 +1,498 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Feedback Command Centre</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{color-scheme:light;
+  --bg:#f7f6f2;--surface-1:#fcfcfb;--card:#ffffff;--text-primary:#0b0b0b;--text-secondary:#52514e;--muted:#8a8984;--line:#e4e2dc;--grid:#eceae4;
+  --chip:#efeee9;--quote:#f3f2ee;--accent:#2a78d6;--accent-ink:#fff;--series-1:#2a78d6;--series-2:#eb6834;
+  --good:#0ca30c;--warning:#fab219;--serious:#ec835a;--critical:#d03b3b;--neutral:#b5b3ac;--focus:#2a78d6}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;
+  --bg:#121211;--surface-1:#1a1a19;--card:#1a1a19;--text-primary:#ffffff;--text-secondary:#c3c2b7;--muted:#96958c;--line:#2e2e2b;--grid:#2a2a27;
+  --chip:#262624;--quote:#232321;--accent:#3987e5;--series-1:#3987e5;--series-2:#d95926;--neutral:#5d5c57;--focus:#3987e5}}
+:root[data-theme="dark"]{color-scheme:dark;
+  --bg:#121211;--surface-1:#1a1a19;--card:#1a1a19;--text-primary:#ffffff;--text-secondary:#c3c2b7;--muted:#96958c;--line:#2e2e2b;--grid:#2a2a27;
+  --chip:#262624;--quote:#232321;--accent:#3987e5;--series-1:#3987e5;--series-2:#d95926;--neutral:#5d5c57;--focus:#3987e5}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text-primary);font:14px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+.bar{max-width:1400px;margin:0 auto;padding:10px 16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+h1{font-size:18px;margin:0;flex:1 1 auto}
+.live{font-size:12px;color:var(--text-secondary);display:flex;gap:6px;align-items:center}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--good)}.dot.paused{background:var(--muted)}.dot.err{background:var(--critical)}
+main{max-width:1400px;margin:0 auto;padding:12px 16px 48px}
+.filters{display:flex;gap:8px;flex-wrap:wrap;align-items:end;margin-bottom:12px}
+.filters label{display:flex;flex-direction:column;font-size:12px;color:var(--text-secondary);gap:2px}
+input,select,textarea,button{font:inherit;color:var(--text-primary)}
+input,select,textarea{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:7px 9px;min-height:36px}
+input[type=number]{width:74px}input[type=checkbox]{min-height:0;padding:0;margin:0 4px 0 0;width:auto}input[type=search]{width:190px}
+button{appearance:none;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:7px 12px;font-weight:600;cursor:pointer;min-height:36px}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+button:disabled{opacity:.5;cursor:default}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 12px}
+.tab{border-radius:999px;padding:6px 12px;border:1px solid var(--line);background:var(--card);cursor:pointer;font-weight:600;display:flex;gap:6px;align-items:center}
+.tab[aria-pressed="true"]{background:var(--text-primary);color:var(--bg);border-color:var(--text-primary)}
+.tab .n{font-variant-numeric:tabular-nums;font-weight:500;opacity:.8}
+.kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:12px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.kpi .k{font-size:12px;color:var(--text-secondary)}.kpi .v{font-size:26px;font-weight:650;font-variant-numeric:tabular-nums;line-height:1.2}
+.kpi .s{font-size:12px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:12px;margin-bottom:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;min-width:0}
+.card h2{font-size:15px;margin:0 0 2px}.card .sub{font-size:12px;color:var(--muted);margin:0 0 8px}
+.chart{position:relative;height:240px}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--text-secondary);margin-top:6px}
+.legend span{display:inline-flex;align-items:center;gap:5px}.sw{width:10px;height:10px;border-radius:3px;display:inline-block}
+.tablewrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-weight:600;color:var(--text-secondary);border-bottom:1px solid var(--line);padding:8px 6px;white-space:nowrap}
+td{border-bottom:1px solid var(--grid);padding:8px 6px;vertical-align:top}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+tr.click{cursor:pointer}tr.click:hover{background:var(--quote)}
+.badge{display:inline-flex;align-items:center;gap:4px;border-radius:999px;padding:2px 8px;font-size:12px;font-weight:600;white-space:nowrap;background:var(--chip);color:var(--text-primary)}
+.badge .i{width:8px;height:8px;border-radius:50%}
+.b-escalated .i{background:var(--critical)}.b-in_queue .i{background:var(--warning)}.b-ready_to_post .i,.b-posted .i{background:var(--good)}
+.b-resolved .i,.b-logged .i,.b-not_posted .i{background:var(--neutral)}
+.flag{color:var(--critical);font-weight:600}
+.words{max-width:520px;white-space:pre-wrap;overflow-wrap:anywhere}
+.clamp{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.scorebar{display:inline-block;width:56px;height:6px;border-radius:3px;background:var(--grid);vertical-align:middle;margin-left:6px;position:relative;overflow:hidden}
+.scorebar b{position:absolute;left:0;top:0;bottom:0;background:var(--series-1);border-radius:3px}
+.muted{color:var(--muted)}.small{font-size:12px}
+a{color:var(--accent)}
+.pager{display:flex;gap:8px;align-items:center;justify-content:flex-end;margin-top:8px}
+dialog{border:1px solid var(--line);border-radius:14px;padding:0;background:var(--card);color:var(--text-primary);width:min(760px,calc(100vw - 32px));max-height:calc(100vh - 48px)}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+.dlg{padding:16px}.dlg h3{margin:0 0 6px;font-size:17px}
+.quote{background:var(--quote);border-left:4px solid var(--accent);border-radius:6px;padding:10px 12px;white-space:pre-wrap;margin:8px 0;overflow-wrap:anywhere}
+.dlg textarea{width:100%;min-height:150px;resize:vertical}
+.dlg dl{display:grid;grid-template-columns:max-content 1fr;gap:4px 12px;margin:8px 0}.dlg dt{color:var(--muted)}.dlg dd{margin:0}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--text-primary);color:var(--bg);padding:10px 16px;border-radius:10px;display:none;z-index:20}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.alert{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--critical);border-radius:10px;padding:10px 14px;margin-bottom:12px}
+@media (max-width:640px){input[type=search]{width:100%}.filters label{flex:1 1 45%}}
+@media (max-width:760px){#feed thead{display:none}#feed tr{display:grid;grid-template-columns:1fr 1fr;gap:6px 10px;border-bottom:1px solid var(--line);padding:10px 0}
+#feed td{border:0;padding:0}#feed td.words{grid-column:1/-1;max-width:none}#feed td.num{text-align:left}}
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <h1>Feedback Command Centre <span class="muted small" id="brand"></span></h1>
+    <div class="live" aria-live="polite"><span class="dot" id="dot"></span><span id="updated">Loading…</span></div>
+    <button id="pause" aria-pressed="false" title="Pause auto-refresh">Pause</button>
+    <button id="me" title="Name recorded against your actions">Set your name</button>
+  </div>
+</header>
+<main>
+  <form class="filters" id="filters" aria-label="Filters">
+    <label>Region<select id="f-region"><option value="">All regions</option></select></label>
+    <label>Location<select id="f-branch"><option value="">All locations</option></select></label>
+    <label>From<input type="date" id="f-from"></label>
+    <label>To<input type="date" id="f-to"></label>
+    <label>Score min<input type="number" id="f-min" min="0" max="100" value="0"></label>
+    <label>Score max<input type="number" id="f-max" min="0" max="100" value="100"></label>
+    <label>Search<input type="search" id="f-q" placeholder="words, name, reg, job…"></label>
+    <button type="submit" class="primary">Apply</button>
+    <button type="button" id="f-reset">Reset</button>
+  </form>
+
+  <div id="alerts"></div>
+
+  <div class="tabs" role="group" aria-label="Status">
+    <button class="tab" data-status="" aria-pressed="true">All <span class="n" id="n-all"></span></button>
+    <button class="tab" data-status="escalated" aria-pressed="false"><span class="badge b-escalated" style="background:none;padding:0"><span class="i"></span></span>Escalated <span class="n" id="n-escalated"></span></button>
+    <button class="tab" data-status="in_queue" aria-pressed="false"><span class="badge b-in_queue" style="background:none;padding:0"><span class="i"></span></span>In Queue <span class="n" id="n-in_queue"></span></button>
+    <button class="tab" data-status="ready_to_post" aria-pressed="false"><span class="badge b-ready_to_post" style="background:none;padding:0"><span class="i"></span></span>Ready to Post <span class="n" id="n-ready_to_post"></span></button>
+    <button class="tab" data-status="resolved" aria-pressed="false">Resolved <span class="n" id="n-resolved"></span></button>
+    <button class="tab" data-status="posted" aria-pressed="false">Posted <span class="n" id="n-posted"></span></button>
+    <button class="tab" data-status="logged" aria-pressed="false">Logged <span class="n" id="n-logged"></span></button>
+  </div>
+
+  <section class="kpis" id="kpis" aria-label="Key figures"></section>
+
+  <section class="card" style="margin-bottom:12px">
+    <h2>All feedback</h2>
+    <p class="sub" id="feed-sub">Newest first. Click a row to read it, reply, or prepare it for posting.</p>
+    <div class="tablewrap"><table id="feed">
+      <thead><tr><th>When</th><th>Location</th><th>Status</th><th>Customer's words</th><th class="num">Score</th><th>Severity</th><th>Customer</th><th>Next step</th></tr></thead>
+      <tbody></tbody></table></div>
+    <div class="pager"><span class="small muted" id="pageinfo"></span><button id="prev">Previous</button><button id="next">Next</button></div>
+  </section>
+
+  <div class="grid">
+    <section class="card"><h2>Average sentiment by week</h2><p class="sub">0-100 (50 = neutral), for the current filter.</p>
+      <div class="chart"><canvas id="c-trend" role="img" aria-label="Weekly average sentiment"></canvas></div><div class="legend" id="l-trend"></div></section>
+    <section class="card"><h2>Feedback volume by week</h2><p class="sub">Split by routing outcome.</p>
+      <div class="chart"><canvas id="c-volume" role="img" aria-label="Weekly feedback volume by outcome"></canvas></div><div class="legend" id="l-volume"></div></section>
+  </div>
+  <div class="grid">
+    <section class="card"><h2>Average sentiment by location</h2><p class="sub">Selected period, lowest first.</p>
+      <div class="chart" id="w-branch"><canvas id="c-branch" role="img" aria-label="Average sentiment by location"></canvas></div></section>
+    <section class="card"><h2>Escalation frequency by location</h2><p class="sub">Share of feedback escalated to managers.</p>
+      <div class="chart" id="w-esc"><canvas id="c-esc" role="img" aria-label="Escalation rate by location"></canvas></div></section>
+  </div>
+
+  <section class="card" style="margin-bottom:12px">
+    <h2>Location scorecard</h2><p class="sub">Volume, sentiment, escalations and response times. ▼ = declining.</p>
+    <div class="tablewrap"><table id="branches"><thead><tr>
+      <th>Location</th><th>Region</th><th class="num">Requests</th><th class="num">Responses</th><th class="num">Response rate</th>
+      <th class="num">Avg score</th><th class="num">Ready to Post</th><th class="num">Mild</th><th class="num">Escalated</th><th class="num">Escalation rate</th>
+      <th class="num">Open</th><th class="num">Median ack (min)</th><th class="num">Overdue</th><th>Trend</th></tr></thead><tbody></tbody></table></div>
+  </section>
+
+  <section class="card"><h2>Top issues</h2><p class="sub">Categories mentioned in non-positive feedback.</p>
+    <div class="tablewrap"><table id="cats"><thead><tr><th>Issue</th><th class="num">Mentions</th></tr></thead><tbody></tbody></table></div></section>
+</main>
+
+<dialog id="dlg" aria-labelledby="dlg-title"><div class="dlg" id="dlg-body"></div></dialog>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+  const API = location.pathname.replace(/\/$/, '') + '/api';
+  // Signed session issued by the (Basic-auth protected) page request - see src/session.js.
+  const SESSION = '__RFE_SESSION__';
+  const DEMO = new URLSearchParams(location.search).has('demo');
+  const REFRESH_MS = 30000;
+  const PAGE = 50;
+  const STATUS = { escalated: 'Escalated', in_queue: 'In Queue', ready_to_post: 'Ready to Post', posted: 'Posted', not_posted: 'Not posting', resolved: 'Resolved', logged: 'Logged' };
+  const LANE = { ready_to_post: 'Positive', logged: 'Neutral', in_queue: 'Mild negative', escalated: 'Escalated' };
+  const state = { status: '', offset: 0, data: null, paused: false, timer: null, charts: {}, openId: null };
+  const $ = (s) => document.querySelector(s);
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+  const fmtDate = (t) => new Date(t).toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+  const pct = (x) => x == null ? '–' : Math.round(x * 100) + '%';
+  // localStorage is unavailable inside n8n's sandboxed pages, so the name also lives in the
+  // URL hash (#me=Tom) - bookmark the dashboard after setting it.
+  const hashGet = (k) => new URLSearchParams(location.hash.slice(1)).get(k);
+  const store = {
+    get(k) { try { const v = localStorage.getItem(k); if (v) return v; } catch (e) {} return hashGet('me'); },
+    set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} try { history.replaceState(null, '', '#me=' + encodeURIComponent(v)); } catch (e) {} },
+  };
+  const actor = () => store.get('rfe_actor') || '';
+
+  function toast(msg) { const t = $('#toast'); t.textContent = msg; t.style.display = 'block'; clearTimeout(t._h); t._h = setTimeout(() => (t.style.display = 'none'), 3500); }
+
+  async function api(body) {
+    if (DEMO) return demoApi(body);
+    const r = await fetch(API, { method: 'POST', headers: { 'content-type': 'application/json', 'x-rfe-session': SESSION }, credentials: 'omit', body: JSON.stringify(body) });
+    if (r.status === 401) { state.paused = true; throw new Error('session expired - reload the page'); }
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const j = await r.json();
+    return j.result !== undefined ? j.result : j;
+  }
+
+  function filters() {
+    const b = $('#f-branch').value;
+    const to = $('#f-to').value;
+    return {
+      from: $('#f-from').value || null,
+      to: to ? new Date(new Date(to).getTime() + 86400000).toISOString().slice(0, 10) : null,
+      branch_ids: b ? [Number(b)] : [], region_id: $('#f-region').value || null,
+      min_score: $('#f-min').value, max_score: $('#f-max').value, q: $('#f-q').value,
+      statuses: state.status ? [state.status] : [], limit: PAGE, offset: state.offset,
+    };
+  }
+
+  async function load() {
+    try {
+      const d = await api({ op: 'data', filters: filters() });
+      state.data = d;
+      render(d);
+      $('#dot').className = 'dot' + (state.paused ? ' paused' : '');
+      $('#updated').textContent = 'Updated ' + new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + (state.paused ? ' · paused' : ' · live');
+    } catch (e) {
+      $('#dot').className = 'dot err';
+      $('#updated').textContent = 'Could not refresh (' + e.message + ')';
+    }
+  }
+  function schedule() { clearInterval(state.timer); if (!state.paused) state.timer = setInterval(() => { if (!$('#dlg').open) load(); }, REFRESH_MS); }
+
+  function fillSelect(sel, items, keep) {
+    const v = sel.value; const first = sel.options[0].outerHTML;
+    sel.innerHTML = first + items.map((i) => `<option value="${i.id}">${esc(i.name)}</option>`).join('');
+    if (keep) sel.value = v;
+  }
+
+  function render(d) {
+    if (!$('#f-branch').options[1]) { fillSelect($('#f-branch'), d.branch_list); fillSelect($('#f-region'), d.region_list); }
+    const k = d.kpis;
+    $('#n-all').textContent = k.responses;
+    for (const s of ['escalated', 'in_queue', 'ready_to_post', 'resolved', 'posted']) {
+      const map = { escalated: k.escalated_open, in_queue: k.in_queue, ready_to_post: k.ready_to_post, resolved: k.resolved, posted: k.posted };
+      $('#n-' + s).textContent = map[s];
+    }
+    $('#n-logged').textContent = '';
+    const tiles = [
+      ['Feedback received', k.responses, `${pct(k.response_rate)} of ${k.requests_sent} requests`],
+      ['Average score', k.avg_score_100 ?? '–', '0-100, 50 = neutral'],
+      ['Escalated - open', k.escalated_open, `${k.overdue_escalations} overdue · ${pct(k.escalation_rate)} of all feedback`],
+      ['In Queue', k.in_queue, `${k.drafts_waiting} draft replies waiting`],
+      ['Ready to Post', k.ready_to_post, `${k.posted} posted`],
+      ['Median time to acknowledge', k.median_ack_minutes == null ? '–' : k.median_ack_minutes + ' min', `${pct(k.ack_within_sla)} within SLA`],
+      ['Repeat unhappy customers', k.repeat_customers, 'escalated automatically'],
+    ];
+    $('#kpis').innerHTML = tiles.map(([a, b, c]) => `<div class="kpi"><div class="k">${esc(a)}</div><div class="v">${esc(b)}</div><div class="s">${esc(c)}</div></div>`).join('');
+
+    const declining = d.branches.filter((b) => b.declining);
+    $('#alerts').innerHTML = (declining.length ? `<div class="alert" role="alert"><b>▼ Declining sentiment:</b> ${declining.map((b) => `${esc(b.name)} (${esc(b.declining_reason)})`).join(' · ')}</div>` : '') +
+      (k.unmatched_inbound ? `<div class="alert" style="border-left-color:var(--warning)"><b>${k.unmatched_inbound}</b> inbound message(s) from unknown numbers need a look. <button id="see-unmatched">View</button></div>` : '');
+    const su = $('#see-unmatched'); if (su) su.onclick = showUnmatched;
+
+    renderFeed(d);
+    renderBranches(d.branches);
+    $('#cats').querySelector('tbody').innerHTML = d.categories.length
+      ? d.categories.map((c) => `<tr><td>${esc(c.cat.replace(/_/g, ' '))}</td><td class="num">${c.n}</td></tr>`).join('')
+      : '<tr><td colspan="2" class="muted">No issues in this period.</td></tr>';
+    renderCharts(d);
+  }
+
+  function nextStep(f) {
+    if (f.status === 'escalated') return f.case_status === 'open' ? `<span class="flag">Acknowledge${f.ack_due_at && new Date(f.ack_due_at) < new Date() ? ' (overdue)' : ''}</span>` : (f.draft && f.draft.status === 'draft' ? 'Review draft reply' : 'Resolve');
+    if (f.status === 'in_queue') return f.draft && f.draft.status === 'draft' ? 'Review draft reply' : 'Resolve';
+    if (f.status === 'ready_to_post') return f.rtp ? (f.rtp.consent === false ? 'Customer declined sharing' : 'Review for posting') : 'Review';
+    return '<span class="muted">–</span>';
+  }
+
+  function renderFeed(d) {
+    const tb = $('#feed').querySelector('tbody');
+    tb.innerHTML = d.feed.length ? d.feed.map((f) => `<tr class="click" tabindex="0" data-id="${f.id}">
+      <td class="small">${fmtDate(f.created_at)}</td>
+      <td>${esc(f.branch)}</td>
+      <td><span class="badge b-${f.status}"><span class="i"></span>${esc(STATUS[f.status] || f.status)}</span>${f.repeat_customer ? '<div class="small flag">Repeat customer</div>' : ''}</td>
+      <td class="words"><div class="clamp">${f.text ? esc(f.text) : `<span class="muted">(tapped “${esc(f.rating || '-')}”, no comment)</span>`}</div></td>
+      <td class="num">${f.score_100}<span class="scorebar" aria-hidden="true"><b style="width:${f.score_100}%"></b></span><div class="small muted">${esc(f.sentiment_label || '')}</div></td>
+      <td>${esc(f.severity_label || '')}<div class="small muted">${f.severity_index}/100</div></td>
+      <td>${esc(f.customer || '')}<div class="small muted">${esc(f.vehicle || '')}</div></td>
+      <td class="small">${nextStep(f)}</td></tr>`).join('')
+      : '<tr><td colspan="8" class="muted">No feedback matches these filters.</td></tr>';
+    tb.querySelectorAll('tr.click').forEach((tr) => {
+      tr.onclick = () => openItem(tr.dataset.id);
+      tr.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openItem(tr.dataset.id); } };
+    });
+    const total = d.feed_total;
+    $('#pageinfo').textContent = total ? `${state.offset + 1}-${Math.min(state.offset + PAGE, total)} of ${total}` : '';
+    $('#prev').disabled = state.offset === 0;
+    $('#next').disabled = state.offset + PAGE >= total;
+  }
+
+  function renderBranches(rows) {
+    $('#branches').querySelector('tbody').innerHTML = rows.map((b) => `<tr>
+      <td>${esc(b.name)}</td><td>${esc(b.region || '')}</td>
+      <td class="num">${b.requests_sent}</td><td class="num">${b.responses}</td><td class="num">${pct(b.response_rate)}</td>
+      <td class="num">${b.avg_score_100 ?? '–'}</td><td class="num">${b.positive}</td><td class="num">${b.mild}</td><td class="num">${b.escalated}</td>
+      <td class="num">${pct(b.escalation_rate)}</td><td class="num">${b.open_items}</td><td class="num">${b.median_ack_minutes ?? '–'}</td>
+      <td class="num">${b.overdue ? `<span class="flag">${b.overdue}</span>` : 0}</td>
+      <td>${b.declining ? `<span class="flag">▼ ${esc(b.declining_reason)}</span>` : (b.trend_delta != null ? `<span class="muted">${b.trend_delta > 0 ? '▲' : b.trend_delta < 0 ? '▽' : '–'} ${Math.round(Math.abs(b.trend_delta) * 50)} pts</span>` : '<span class="muted">not enough data</span>')}</td>
+    </tr>`).join('');
+  }
+
+  // ------------------------------------------------------------------ charts
+  function baseOpts(yMax, ySuffix) {
+    const grid = css('--grid'); const ink = css('--text-secondary');
+    return {
+      responsive: true, maintainAspectRatio: false, animation: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: { legend: { display: false }, tooltip: { backgroundColor: css('--text-primary'), titleColor: css('--bg'), bodyColor: css('--bg'), padding: 10, cornerRadius: 8,
+        callbacks: ySuffix ? { label: (c) => ` ${c.dataset.label}: ${c.formattedValue}${ySuffix}` } : {} } },
+      scales: {
+        x: { grid: { display: false }, border: { color: grid }, ticks: { color: ink, maxRotation: 0, autoSkip: true } },
+        y: { beginAtZero: true, max: yMax, grid: { color: grid }, border: { display: false }, ticks: { color: ink, precision: 0 } },
+      },
+    };
+  }
+  function chart(id, cfg) {
+    if (state.charts[id]) state.charts[id].destroy();
+    if (!window.Chart) return;
+    state.charts[id] = new Chart(document.getElementById(id), cfg);
+  }
+  function legend(el, items) { $(el).innerHTML = items.map(([c, l]) => `<span><i class="sw" style="background:${c}"></i>${esc(l)}</span>`).join(''); }
+  const wk = (d) => new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+
+  function renderCharts(d) {
+    const s1 = css('--series-1'); const s2 = css('--series-2');
+    const weeks = d.trend.map((t) => t.week);
+    const sel = Number($('#f-branch').value) || null;
+    const selName = sel ? (d.branch_list.find((b) => b.id === sel) || {}).name : null;
+    // The API already applies the location/region filter, so this line is the current selection.
+    const label = selName || ($('#f-region').value ? $('#f-region').selectedOptions[0].textContent : 'All locations');
+    const ds = [{ label, data: d.trend.map((t) => t.avg_score_100), borderColor: s1, backgroundColor: s1, borderWidth: 2, pointRadius: 3, pointHoverRadius: 6, tension: 0.25 }];
+    chart('c-trend', { type: 'line', data: { labels: weeks.map(wk), datasets: ds }, options: baseOpts(100) });
+    legend('#l-trend', [[s1, ds[0].label]]);
+
+    const vol = [
+      ['escalated', 'Escalated', css('--critical')], ['mild', 'Mild negative (In Queue)', css('--warning')],
+      ['positive', 'Positive (Ready to Post)', css('--good')],
+    ];
+    chart('c-volume', { type: 'bar', data: { labels: weeks.map(wk), datasets: vol.map(([k, l, c]) => ({ label: l, data: d.trend.map((t) => t[k]), backgroundColor: c, borderColor: css('--card'), borderWidth: { top: 2 }, borderSkipped: false, borderRadius: 3, maxBarThickness: 36 })) },
+      options: { ...baseOpts(), scales: { ...baseOpts().scales, x: { ...baseOpts().scales.x, stacked: true }, y: { ...baseOpts().scales.y, stacked: true } } } });
+    legend('#l-volume', vol.map(([, l, c]) => [c, l]));
+
+    const br = d.branches.filter((b) => b.responses > 0).sort((a, b) => (a.avg_score_100 ?? 0) - (b.avg_score_100 ?? 0));
+    const h = Math.max(160, br.length * 30 + 40);
+    $('#w-branch').style.height = h + 'px'; $('#w-esc').style.height = h + 'px';
+    const hopts = (max, suffix) => { const o = baseOpts(max, suffix); o.indexAxis = 'y'; o.interaction = { mode: 'nearest', axis: 'y', intersect: false };
+      o.scales = { x: { ...o.scales.y, max }, y: { grid: { display: false }, border: { color: css('--grid') }, ticks: { color: css('--text-secondary') } } }; return o; };
+    chart('c-branch', { type: 'bar', data: { labels: br.map((b) => (b.declining ? '▼ ' : '') + b.name), datasets: [{ label: 'Avg score', data: br.map((b) => b.avg_score_100), backgroundColor: s1, borderRadius: 4, maxBarThickness: 18 }] }, options: hopts(100) });
+    const byEsc = [...br].sort((a, b) => b.escalation_rate - a.escalation_rate);
+    chart('c-esc', { type: 'bar', data: { labels: byEsc.map((b) => b.name), datasets: [{ label: 'Escalated', data: byEsc.map((b) => Math.round(b.escalation_rate * 100)), backgroundColor: s2, borderRadius: 4, maxBarThickness: 18 }] }, options: hopts(100, '%') });
+  }
+
+  // ------------------------------------------------------------------ detail dialog
+  function item(id) { return state.data.feed.find((f) => f.id === id); }
+
+  function openItem(id) {
+    const f = item(id); if (!f) return;
+    state.openId = id;
+    const reasons = (f.reasons || []).join('; ');
+    let actions = '';
+    if (f.case_token) {
+      const d = f.draft;
+      actions += f.case_status === 'open' ? `<p><button class="primary" data-act="acknowledge">Acknowledge - I'm on it</button></p>` : '';
+      if (d && d.status === 'draft') {
+        actions += `<h3 style="margin-top:14px">Draft reply <span class="small muted">(${d.source === 'ai' ? 'AI-drafted' : 'template'} - not sent)</span></h3>
+          <label class="sr" for="draft">Draft reply</label><textarea id="draft" maxlength="1500">${esc(d.text)}</textarea>
+          <div class="row" style="margin-top:8px"><button class="primary" data-act="send_draft">Send reply to customer</button>
+          <button data-act="save_draft">Save edits</button><button data-act="handled_offline">I called them instead</button><button data-act="discard_draft">Discard</button></div>`;
+      } else if (d) {
+        actions += `<p class="small muted">Reply ${esc(d.status.replace('_', ' '))}.</p>${d.text ? `<div class="quote">${esc(d.text)}</div>` : ''}`;
+      }
+      if (f.status !== 'resolved') {
+        actions += `<h3 style="margin-top:14px">Resolve</h3><label class="small muted" for="notes">What was done</label><textarea id="notes" style="min-height:70px"></textarea>
+          <div class="row" style="margin-top:8px"><button data-act="resolve">Mark resolved</button><a class="small" href="${esc(caseUrl(f))}" target="_blank" rel="noopener">Open full case page ↗</a></div>`;
+      } else {
+        actions += `<p><button data-act="reopen">Reopen</button> <a class="small" href="${esc(caseUrl(f))}" target="_blank" rel="noopener">Open full case page ↗</a></p>`;
+      }
+    }
+    if (f.rtp) {
+      const t = f.rtp;
+      actions += `<h3 style="margin-top:14px">Ready to Post</h3>
+        <p class="small muted">Never published automatically. Edit, post it yourself, then record where. Customer consent to share: <b>${t.consent === true ? 'Yes' : t.consent === false ? 'No - do not publish their words' : 'not answered'}</b>.</p>
+        <label class="small muted" for="rtp-text">Text to post</label><textarea id="rtp-text">${esc(t.edited_text || f.text || '')}</textarea>
+        <label class="small muted" for="rtp-name">Shown as</label><input id="rtp-name" style="width:100%" value="${esc(t.display_name || '')}">
+        <fieldset style="border:0;padding:0;margin:8px 0"><legend class="small muted">Posted to</legend><div class="row">
+          ${['google', 'facebook', 'website', 'instagram', 'other'].map((p) => `<label class="small"><input type="checkbox" name="plat" value="${p}" ${(t.platforms || []).includes(p) ? 'checked' : ''}> ${p}</label>`).join('')}</div></fieldset>
+        <div class="row"><button data-act="copy">Copy text</button><button data-rtp="save">Save edits</button>
+        <button class="primary" data-rtp="posted">Mark as posted</button><button data-rtp="not_posted">Don't post</button>${t.status !== 'ready_to_post' ? '<button data-rtp="reopen">Back to queue</button>' : ''}</div>`;
+    }
+    $('#dlg-body').innerHTML = `
+      <div class="row" style="justify-content:space-between"><span class="badge b-${f.status}"><span class="i"></span>${esc(STATUS[f.status] || f.status)}</span><button data-act="close" aria-label="Close">✕</button></div>
+      <h3 id="dlg-title" style="margin-top:8px">${esc(f.summary || 'Customer feedback')}</h3>
+      <p class="small muted">${esc(f.branch)} · ${fmtDate(f.created_at)} · via ${esc(f.channel)} · ${esc(f.service_type || '')} ${esc(f.vehicle || '')}</p>
+      <div class="quote">${f.text ? esc(f.text) : `(tapped “${esc(f.rating || '-')}”, no comment yet)`}</div>
+      <dl><dt>Customer</dt><dd>${esc(f.customer || '')} ${f.customer_phone ? `· <a href="tel:${esc(f.customer_phone)}">${esc(f.customer_phone)}</a>` : ''}${f.repeat_customer ? ` · <span class="flag">repeat customer (${f.previous_negative_count} earlier negative)</span>` : ''}</dd>
+      <dt>Sentiment</dt><dd>${f.score_100}/100 · ${esc(f.sentiment_label || '')}</dd>
+      <dt>Severity</dt><dd>${f.severity_index}/100 · ${esc(f.severity_label || '')}</dd>
+      <dt>Routed as</dt><dd>${esc(LANE[f.lane] || f.lane)} (${esc(f.tier)})</dd>
+      ${reasons ? `<dt>Why</dt><dd>${esc(reasons)}</dd>` : ''}
+      <dt>Suggested</dt><dd>${esc(f.recommended_action || '')}</dd></dl>
+      ${actions}`;
+    $('#dlg-body').querySelectorAll('[data-act],[data-rtp]').forEach((b) => (b.onclick = () => act(f, b)));
+    if (!$('#dlg').open) $('#dlg').showModal();
+  }
+
+  function caseUrl(f) { return location.pathname.replace(/\/dashboard\/?$/, '/case') + '?t=' + encodeURIComponent(f.case_token); }
+
+  async function act(f, btn) {
+    const a = btn.dataset.act; const r = btn.dataset.rtp;
+    if (a === 'close') return $('#dlg').close();
+    if (a === 'copy') { try { await navigator.clipboard.writeText($('#rtp-text').value); toast('Copied'); } catch (e) { toast('Copy failed - select the text instead'); } return; }
+    if (!actor()) { setActor(); if (!actor()) return; }
+    btn.disabled = true;
+    try {
+      let res;
+      if (r) {
+        res = await api({ op: 'rtp_action', id: f.rtp.id, action: r, edited_text: $('#rtp-text').value, display_name: $('#rtp-name').value,
+          platforms: [...document.querySelectorAll('input[name=plat]:checked')].map((x) => x.value), actor: actor() });
+      } else {
+        if (a === 'send_draft' && !confirm('Send this reply to ' + (f.customer || 'the customer') + ' now?')) { btn.disabled = false; return; }
+        res = await api({ op: 'case_action', token: f.case_token, action: a, actor: actor(),
+          draft_text: $('#draft') ? $('#draft').value : undefined, notes: $('#notes') ? $('#notes').value : undefined });
+      }
+      if (res && res.ok === false) throw new Error(res.error || 'failed');
+      toast({ send_draft: 'Reply queued - sending now', acknowledge: 'Acknowledged', resolve: 'Resolved', posted: 'Marked as posted' }[a || r] || 'Saved');
+      await load();
+      if (item(f.id)) openItem(f.id); else $('#dlg').close();
+    } catch (e) { toast('Error: ' + e.message); btn.disabled = false; }
+  }
+
+  async function showUnmatched() {
+    const rows = await api({ op: 'unmatched' });
+    $('#dlg-body').innerHTML = `<div class="row" style="justify-content:space-between"><h3 id="dlg-title">Messages from unknown numbers</h3><button data-x aria-label="Close">✕</button></div>
+      <p class="small muted">Not linked to any customer or job. Reply from WhatsApp/SMS directly, then mark handled.</p>
+      <table><tbody>${rows.map((u) => `<tr><td class="small">${fmtDate(u.received_at)}</td><td>${esc(u.from_address || '')}<div class="small muted">${esc(u.channel)}</div></td><td class="words">${esc(u.body || '')}</td><td><button data-h="${u.id}">Handled</button></td></tr>`).join('')}</tbody></table>`;
+    $('#dlg-body').querySelector('[data-x]').onclick = () => $('#dlg').close();
+    $('#dlg-body').querySelectorAll('[data-h]').forEach((b) => (b.onclick = async () => { await api({ op: 'unmatched_handled', id: b.dataset.h }); showUnmatched(); load(); }));
+    if (!$('#dlg').open) $('#dlg').showModal();
+  }
+
+  function setActor() {
+    const n = prompt('Your name (recorded against replies and actions):', actor());
+    if (n !== null) { store.set('rfe_actor', n.trim()); $('#me').textContent = n.trim() || 'Set your name'; }
+  }
+
+  // ------------------------------------------------------------------ wiring
+  document.querySelectorAll('.tab').forEach((t) => (t.onclick = () => {
+    document.querySelectorAll('.tab').forEach((x) => x.setAttribute('aria-pressed', 'false'));
+    t.setAttribute('aria-pressed', 'true'); state.status = t.dataset.status; state.offset = 0; load();
+  }));
+  $('#filters').onsubmit = (e) => { e.preventDefault(); state.offset = 0; load(); };
+  $('#f-branch').onchange = () => { state.offset = 0; load(); };
+  $('#f-region').onchange = () => { state.offset = 0; load(); };
+  $('#f-reset').onclick = () => { $('#filters').reset(); $('#f-from').value = defaultFrom(); state.offset = 0; load(); };
+  $('#prev').onclick = () => { state.offset = Math.max(0, state.offset - PAGE); load(); };
+  $('#next').onclick = () => { state.offset += PAGE; load(); };
+  $('#pause').onclick = () => { state.paused = !state.paused; $('#pause').textContent = state.paused ? 'Resume' : 'Pause'; $('#pause').setAttribute('aria-pressed', String(state.paused)); schedule(); load(); };
+  $('#me').onclick = setActor;
+  if (actor()) $('#me').textContent = actor();
+  function defaultFrom() { return new Date(Date.now() - 56 * 86400000).toISOString().slice(0, 10); }
+  $('#f-from').value = defaultFrom();
+  document.addEventListener('visibilitychange', () => { if (!document.hidden && !state.paused) load(); });
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => state.data && renderCharts(state.data));
+
+  // ------------------------------------------------------------------ demo data (?demo=1)
+  function demoApi(body) {
+    if (body.op !== 'data') return Promise.resolve({ ok: true });
+    const branches = ['Leeds North', 'Leeds South', 'Manchester City', 'London West', 'Bristol'].map((n, i) => ({ id: i + 1, name: n, region_id: i < 3 ? 1 : 2 }));
+    const texts = [
+      ['It was fine, a bit slow', 'in_queue', 'P4_LOW', 46, 5, 'Mildly negative', 'Low'],
+      ['You ruined my car and wasted my whole day', 'escalated', 'P1_CRITICAL', 8, 95, 'Severely negative', 'Critical'],
+      ['Dan was brilliant - tyres fitted in 30 minutes and he explained everything.', 'ready_to_post', 'POSITIVE', 96, 0, 'Very positive', 'None'],
+      ['Charged me more than the quote without asking. Not happy at all.', 'escalated', 'P2_HIGH', 14, 58, 'Severely negative', 'High'],
+      ['Good job but it was a bit late picking up', 'in_queue', 'P4_LOW', 63, 0, 'Mildly positive', 'Low'],
+      ['Great service as always, thank you', 'ready_to_post', 'POSITIVE', 92, 0, 'Very positive', 'None'],
+    ];
+    const now = Date.now();
+    const feed = Array.from({ length: 18 }, (_, i) => {
+      const t = texts[i % texts.length]; const b = branches[i % 5];
+      return { id: 'demo' + i, created_at: new Date(now - i * 5.5 * 3600e3).toISOString(), branch_id: b.id, branch: b.name, customer: ['Sarah Jones', 'Mo Ali', 'Priya K', 'Tom B'][i % 4],
+        customer_phone: '+447700900' + (100 + i), channel: 'whatsapp', text: t[0], lane: t[1], status: i === 7 ? 'resolved' : t[1], tier: t[2], score_100: t[3], severity_index: t[4],
+        sentiment_label: t[5], severity_label: t[6], repeat_customer: i === 3, previous_negative_count: i === 3 ? 1 : 0, summary: t[0], reasons: t[1] === 'escalated' ? ['damage to customer vehicle'] : [],
+        recommended_action: 'Call the customer today.', vehicle: 'Ford Focus AB12 CDE', service_type: 'Full service', case_token: t[1].match(/queue|escalated/) ? 'tok' + i : null, case_status: i % 3 ? 'acknowledged' : 'open',
+        ack_due_at: new Date(now - 3600e3).toISOString(), draft: t[1].match(/queue|escalated/) ? { id: 'd' + i, status: 'draft', source: 'ai', text: 'Hi Sarah, thank you for telling us…' } : null,
+        rtp: t[1] === 'ready_to_post' ? { id: 'r' + i, status: 'ready_to_post', consent: true, platforms: [], display_name: 'Mo, Manchester' } : null };
+    }).filter((f) => !state.status || f.status === state.status);
+    const weeks = Array.from({ length: 8 }, (_, i) => new Date(now - (7 - i) * 7 * 86400e3).toISOString().slice(0, 10));
+    const trend = weeks.map((w, i) => ({ week: w, responses: 30 + i * 3, avg_score_100: 70 - (i > 5 ? 9 : 0) + (i % 2), escalated: 2 + (i > 5 ? 4 : 0), mild: 6 + (i % 3), positive: 20 + i }));
+    return Promise.resolve({
+      kpis: { requests_sent: 412, responses: 187, response_rate: 0.454, avg_score_100: 68.4, ready_to_post: 23, posted: 41, in_queue: 12, escalated_open: 3, escalated_total: 19, escalation_rate: 0.10, resolved: 27, repeat_customers: 2, drafts_waiting: 9, median_ack_minutes: 14.5, ack_within_sla: 0.92, overdue_escalations: 1, unmatched_inbound: 1 },
+      branches: branches.map((b, i) => ({ ...b, region: i < 3 ? 'North' : 'South', requests_sent: 80 + i * 5, responses: 35 + i * 2, response_rate: 0.44, avg_score_100: [58, 74, 69, 81, 66][i], positive: 20, neutral: 3, mild: 6, escalated: [9, 3, 4, 1, 2][i],
+        escalation_rate: [0.26, 0.08, 0.1, 0.03, 0.06][i], open_items: 3, median_ack_minutes: [22, 12, 9, 15, 30][i], overdue: i === 0 ? 1 : 0, trend_delta: [-0.2, 0.02, -0.03, 0.05, 0][i], declining: i === 0, declining_reason: i === 0 ? 'Sentiment down 10 pts vs previous 28 days' : null })),
+      trend, trend_by_branch: [], categories: [{ cat: 'delay_turnaround', n: 14 }, { cat: 'communication', n: 9 }, { cat: 'pricing_billing', n: 6 }, { cat: 'workmanship', n: 4 }, { cat: 'vehicle_damage', n: 2 }],
+      feed_total: feed.length, feed, branch_list: branches, region_list: [{ id: 1, name: 'North' }, { id: 2, name: 'South' }],
+    });
+  }
+
+  load(); schedule();
+})();
+</script>
+</body>
+</html>

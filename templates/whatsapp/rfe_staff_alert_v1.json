@@ -1,0 +1,13 @@
+{
+  "_comment": "Staff escalation alert (UTILITY). Staff numbers must have opted in to receive WhatsApp from the business number. Params: 1=severity label, 2=branch, 3=customer name + phone, 4=score/100 (or overdue note), 5=customer's words, 6=why flagged, 7=case link.",
+  "name": "rfe_staff_alert_v1",
+  "language": "en_GB",
+  "category": "UTILITY",
+  "components": [
+    {
+      "type": "BODY",
+      "text": "🚨 {{1}} customer feedback - {{2}}\nCustomer: {{3}}\nScore: {{4}}\n\"{{5}}\"\nWhy: {{6}}\n\nOpen the case to acknowledge and send the drafted reply: {{7}}",
+      "example": { "body_text": [["🔴 CRITICAL", "Leeds North", "Sarah Jones (+447700900123)", "8", "You ruined my car and wasted my whole day", "damage to customer vehicle", "https://n8n.example.com/webhook/rfe/case?t=abc&c=1"]] }
+    }
+  ]
+}

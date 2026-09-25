@@ -1,0 +1,22 @@
+{
+  "_comment": "Sent once, 24h after the request, only if the customer has not replied (collection.reminder_after_hours / max_reminders). Params: 1=first name, 2=branch.",
+  "name": "rfe_feedback_reminder_v1",
+  "language": "en_GB",
+  "category": "UTILITY",
+  "components": [
+    {
+      "type": "BODY",
+      "text": "Hi {{1}}, a quick reminder from {{2}}: how was your visit? One tap is perfect.",
+      "example": { "body_text": [["Sarah", "Leeds North"]] }
+    },
+    { "type": "FOOTER", "text": "Reply STOP to opt out" },
+    {
+      "type": "BUTTONS",
+      "buttons": [
+        { "type": "QUICK_REPLY", "text": "😀 Great" },
+        { "type": "QUICK_REPLY", "text": "😐 OK" },
+        { "type": "QUICK_REPLY", "text": "😞 Not good" }
+      ]
+    }
+  ]
+}
