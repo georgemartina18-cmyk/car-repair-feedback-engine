@@ -1,0 +1,24 @@
+{
+  "name": "autocare-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AutoCare Chain Dashboard: Express + SQLite API",
+  "main": "src/server.js",
+  "engines": { "node": ">=20.19" },
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node --test",
+    "reset-password": "node scripts/reset-password.js",
+    "reset-data": "node scripts/reset-data.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.7.0",
+    "jsonwebtoken": "^9.0.3",
+    "sql.js": "^1.14.2"
+  }
+}

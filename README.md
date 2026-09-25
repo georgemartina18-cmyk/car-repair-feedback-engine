@@ -4,6 +4,8 @@
 
 Every completed job triggers a WhatsApp feedback request. The engine reads the customer's reply, scores **sentiment and severity**, and checks whether this customer has **complained before**. It then routes each item to one of three lanes: **Ready to Post**, **In Queue**, or **Escalated** (branch lead, regional manager and HQ alerted instantly). It drafts a personalised reply for every negative item, for a person to review and send. Management sees **every location in one dashboard**.
 
+> **Also in this repo:** [`autocare-dashboard/`](autocare-dashboard/README.md) is a standalone booking form and admin panel (Node.js + Express + SQLite + React). Customers book service appointments; the admin tracks jobs across the four branches. Run it with `cd autocare-dashboard && npm install && npm run dev`.
+
 ![Dashboard](docs/dashboard-layout.png)
 
 ## What it does

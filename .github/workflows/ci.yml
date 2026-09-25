@@ -26,3 +26,20 @@ jobs:
         env:
           RFE_TEST_DATABASE_URL: postgres://rfe:rfe@localhost:5432/rfe_test
         run: npm test
+
+  autocare-dashboard:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: autocare-dashboard
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install
+        run: npm install
+      - name: API tests
+        run: npm test
+      - name: Build frontend
+        run: npm run build

@@ -1,0 +1,19 @@
+{
+  "name": "autocare-chain-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AutoCare Chain Dashboard: public booking form + admin panel for a multi-branch car care chain",
+  "engines": { "node": ">=20.19" },
+  "scripts": {
+    "postinstall": "npm install --prefix backend && npm install --prefix frontend",
+    "dev": "concurrently -k -n api,web -c blue,yellow \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\"",
+    "build": "npm run build --prefix frontend",
+    "start": "npm run build && npm start --prefix backend",
+    "test": "npm test --prefix backend",
+    "reset-password": "npm run reset-password --prefix backend --",
+    "reset-data": "npm run reset-data --prefix backend"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.4"
+  }
+}
