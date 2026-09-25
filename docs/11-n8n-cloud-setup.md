@@ -48,7 +48,9 @@ The transaction pooler (port 6543) also works, because every query this system s
 
 ## 11.3 Setup checklist for your instance
 
-1. **Create the database** (for example on Supabase: Project → SQL editor). Run, in order: `database/001_schema.sql`, `002_functions.sql`, `003_settings.sql`. Then load your branches and staff (see [02-n8n-setup.md §2.1](02-n8n-setup.md#21-loading-your-organisation)).
+1. **Create the database.** If `001_schema.sql` stops with *"tables already exist with a different structure"* or *"column … does not exist"*, the project has leftover tables from an earlier attempt. Run `database/000_reset.sql` first. It deletes those tables and their data, so use it only on a fresh project. Then run the files below again.
+
+   **Create the database** (for example on Supabase: Project → SQL editor). Run, in order: `database/001_schema.sql`, `002_functions.sql`, `003_settings.sql`. Then load your branches and staff (see [02-n8n-setup.md §2.1](02-n8n-setup.md#21-loading-your-organisation)).
 2. **Point the engine at your instance:**
 
    ```sql

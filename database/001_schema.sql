@@ -3,6 +3,32 @@
 -- PostgreSQL 14+.  Idempotent: safe to re-run.
 -- =============================================================================
 
+-- Pre-flight: stop with a clear message if a table with one of our names already
+-- exists but was created by something else (CREATE TABLE IF NOT EXISTS would skip
+-- it silently and later statements would fail with "column ... does not exist").
+DO $$
+DECLARE
+  r record;
+  bad text := '';
+BEGIN
+  FOR r IN SELECT * FROM (VALUES
+      ('app_settings','value'), ('regions','name'), ('branches','code'), ('staff_contacts','role'),
+      ('customers','opted_out'), ('jobs','external_job_id'), ('feedback_requests','token'),
+      ('feedback','request_id'), ('feedback_messages','direction'), ('cases','feedback_id'),
+      ('case_events','case_id'), ('response_drafts','draft_text'), ('ready_to_post','original_text'),
+      ('outbox','channels'), ('unmatched_inbound','handled')) AS t(tbl, col)
+  LOOP
+    IF to_regclass(quote_ident(current_schema()) || '.' || r.tbl) IS NOT NULL
+       AND NOT EXISTS (SELECT 1 FROM information_schema.columns
+                        WHERE table_schema = current_schema() AND table_name = r.tbl AND column_name = r.col) THEN
+      bad := bad || ' ' || r.tbl;
+    END IF;
+  END LOOP;
+  IF bad <> '' THEN
+    RAISE EXCEPTION 'These tables already exist with a different structure (probably from an earlier attempt):%. Run database/000_reset.sql to remove them (deletes their data), then run this file again.', bad;
+  END IF;
+END $$;
+
 CREATE TABLE IF NOT EXISTS app_settings (
   key         text PRIMARY KEY,
   value       jsonb NOT NULL,
