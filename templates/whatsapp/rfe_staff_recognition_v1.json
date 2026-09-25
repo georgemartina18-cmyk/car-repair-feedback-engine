@@ -1,0 +1,13 @@
+{
+  "_comment": "Optional: only used if you add notify_roles to routing.POSITIVE. Params: 1=branch, 2=staff named, 3=customer's words, 4=customer first name.",
+  "name": "rfe_staff_recognition_v1",
+  "language": "en_GB",
+  "category": "UTILITY",
+  "components": [
+    {
+      "type": "BODY",
+      "text": "🌟 Customer kudos for {{1}} - shout-out to {{2}}!\n\"{{3}}\"\n- {{4}}",
+      "example": { "body_text": [["Leeds North", "Dave", "Dave was brilliant and explained everything", "Sarah"]] }
+    }
+  ]
+}

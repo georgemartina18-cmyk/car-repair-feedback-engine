@@ -1,0 +1,22 @@
+{
+  "_comment": "Submit via WhatsApp Manager or POST https://graph.facebook.com/{version}/{WABA_ID}/message_templates. Category UTILITY (post-transaction follow-up). Params: 1=customer first name, 2=branch name, 3=service, 4=vehicle reg. Quick-reply payloads are set per message (RATE_GREAT:<request_id>) so each tap maps to the exact job.",
+  "name": "rfe_feedback_request_v1",
+  "language": "en_GB",
+  "category": "UTILITY",
+  "components": [
+    {
+      "type": "BODY",
+      "text": "Hi {{1}}, thanks for visiting {{2}} today for your {{3}} ({{4}}).\n\nHow did we do? Tap a button below, or reply with a few words. Every reply is read by the branch team.",
+      "example": { "body_text": [["Sarah", "Leeds North", "full service", "AB12 CDE"]] }
+    },
+    { "type": "FOOTER", "text": "Reply STOP to opt out" },
+    {
+      "type": "BUTTONS",
+      "buttons": [
+        { "type": "QUICK_REPLY", "text": "😀 Great" },
+        { "type": "QUICK_REPLY", "text": "😐 OK" },
+        { "type": "QUICK_REPLY", "text": "😞 Not good" }
+      ]
+    }
+  ]
+}
