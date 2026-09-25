@@ -161,9 +161,10 @@ test('summary totals add up', async () => {
   const { status, body } = await call('GET', '/admin/summary');
   assert.equal(status, 200);
   assert.equal(body.branches.length, 4);
-  const count = db.get('SELECT COUNT(*) AS n, SUM(amount_paid) AS rev FROM bookings');
+  const count = db.get('SELECT COUNT(*) AS n FROM bookings');
   assert.equal(body.totals.total, count.n);
-  assert.equal(body.totals.revenue, count.rev);
+  // No money totals are sent, overall or per branch.
+  assert.ok(!JSON.stringify(body).includes('revenue'));
   assert.equal(body.totals.pending + body.totals.in_progress + body.totals.completed, count.n);
   assert.ok(body.totals.booked_today >= 1); // the booking made above
   assert.equal(body.weekStart, startOfWeek(body.today));

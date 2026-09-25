@@ -6,7 +6,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../../api.js';
-import { formatNaira } from '../../format.js';
 
 export default function SummaryPage() {
   const [data, setData] = useState(null);
@@ -41,13 +40,6 @@ export default function SummaryPage() {
         <Stat label="Bookings This Week" value={t.booked_week} sub={`${t.scheduled_week} appointments scheduled this week`} />
         <Stat label="Pending" value={t.pending} sub={`${t.in_progress} in progress`} tone="pending" />
         <Stat label="Completed" value={t.completed} sub={`of ${t.total} bookings in total`} tone="completed" />
-        <Stat
-          label="Total Revenue Collected"
-          value={formatNaira(t.revenue)}
-          sub={`${formatNaira(t.revenue_completed)} from completed jobs`}
-          tone="revenue"
-          wide
-        />
       </div>
 
       <h2 className="section-title">Per branch</h2>
@@ -60,8 +52,6 @@ export default function SummaryPage() {
                 {b.total} total
               </Link>
             </div>
-            <div className="branch-revenue">{formatNaira(b.revenue)}</div>
-            <div className="muted small">revenue collected</div>
             <ProgressBar pending={b.pending} inProgress={b.in_progress} completed={b.completed} />
             <dl className="branch-stats">
               <div><dt>Pending</dt><dd className="t-pending">{b.pending}</dd></div>
@@ -78,9 +68,9 @@ export default function SummaryPage() {
   );
 }
 
-function Stat({ label, value, sub, tone, wide }) {
+function Stat({ label, value, sub, tone }) {
   return (
-    <div className={`card stat ${tone ? `stat-${tone}` : ''} ${wide ? 'stat-wide' : ''}`}>
+    <div className={`card stat ${tone ? `stat-${tone}` : ''}`}>
       <div className="stat-label">{label}</div>
       <div className="stat-value">{value}</div>
       {sub && <div className="stat-sub">{sub}</div>}

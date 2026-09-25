@@ -82,15 +82,14 @@ router.get('/summary', (req, res) => {
   const todayStartUtc = startOfDayUtc(today, config.TIMEZONE).toISOString();
   const weekStartUtc = startOfDayUtc(weekStart, config.TIMEZONE).toISOString();
 
-  // One query does all the counting, per branch.
+  // One query does all the counting, per branch. Money totals are left out
+  // on purpose: the summary never sends revenue figures to the browser.
   const rows = db.all(
     `SELECT branch,
             COUNT(*)                                                     AS total,
             SUM(status = 'pending')                                      AS pending,
             SUM(status = 'in_progress')                                  AS in_progress,
             SUM(status = 'completed')                                    AS completed,
-            COALESCE(SUM(amount_paid), 0)                                AS revenue,
-            COALESCE(SUM(CASE WHEN status = 'completed' THEN amount_paid END), 0) AS revenue_completed,
             SUM(created_at >= ?)                                         AS booked_today,
             SUM(created_at >= ?)                                         AS booked_week,
             SUM(substr(scheduled_date, 1, 10) = ?)                       AS scheduled_today,
@@ -101,12 +100,11 @@ router.get('/summary', (req, res) => {
   );
 
   // Always show every configured branch, even with zero bookings. Also show
-  // old branch names that still have bookings, so no money goes missing.
+  // old branch names that still have bookings, so none go missing.
   const byName = Object.fromEntries(rows.map((r) => [r.branch, r]));
   const names = [...BRANCHES, ...rows.map((r) => r.branch).filter((b) => !BRANCHES.includes(b))];
   const fields = [
-    'total', 'pending', 'in_progress', 'completed', 'revenue', 'revenue_completed',
-    'booked_today', 'booked_week', 'scheduled_today', 'scheduled_week',
+    'total', 'pending', 'in_progress', 'completed', 'booked_today', 'booked_week', 'scheduled_today', 'scheduled_week',
   ];
   const branches = names.map((name) => {
     const r = byName[name] || {};

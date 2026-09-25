@@ -82,8 +82,6 @@ export default function BookingsPage() {
     });
   }, [bookings, sort]);
 
-  const totalAmount = useMemo(() => bookings.reduce((s, b) => s + b.amount_paid, 0), [bookings]);
-
   function toggleSort(key) {
     setSort((s) => (s.key === key ? { key, dir: s.dir === 'asc' ? 'desc' : 'asc' } : { key, dir: 'asc' }));
   }
@@ -123,7 +121,7 @@ export default function BookingsPage() {
         <div>
           <h1>All Bookings / Jobs</h1>
           <p className="muted">
-            {loading ? 'Loading…' : `${bookings.length} booking${bookings.length === 1 ? '' : 's'} · ${formatNaira(totalAmount)}`}
+            {loading ? 'Loading…' : `${bookings.length} booking${bookings.length === 1 ? '' : 's'}`}
           </p>
         </div>
         <button className="btn btn-secondary" onClick={load} disabled={loading}>

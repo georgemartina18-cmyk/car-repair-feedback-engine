@@ -5,7 +5,7 @@ A web app for a car care and auto repair chain with four branches. Customers boo
 - **Public booking form** (`/`): customer details, service, branch, amount paid, preferred date and time. Each booking gets a reference number such as `AUTO-260925-0001`.
 - **Admin panel** (`/admin`, login required):
   - **All Bookings / Jobs**: a sortable table with filters (branch, status, date range), search (name, phone, booking ref), and one-click **Mark as Completed**.
-  - **Branch Summary**: bookings today and this week, pending and completed per branch, and total revenue.
+  - **Branch Summary**: bookings today and this week, and pending and completed jobs per branch. No money totals are shown.
   - **Settings**: change the admin password and view system info.
 
 | | |
@@ -163,7 +163,7 @@ and the backend accepts them in new bookings. Nothing else needs changing: no da
 
 **Notes**
 
-- Old bookings keep the name they were saved with. If you **rename** a branch, its old bookings keep the old name. The summary page still shows them as their own card, so no revenue goes missing.
+- Old bookings keep the name they were saved with. If you **rename** a branch, its old bookings keep the old name. The summary page still shows them as their own card, so none go missing.
 - Opening hours (which times customers can choose) are in the same file: `BUSINESS_HOURS`.
 
 ---
@@ -264,7 +264,7 @@ The database is one SQLite file: `backend/data/autocare.sqlite`. **To back up, c
 | `POST /api/auth/change-password` | ✔ | `{ currentPassword, newPassword }` |
 | `GET /api/admin/bookings` | ✔ | query: `branch`, `status`, `from`, `to` (YYYY-MM-DD), `q` |
 | `PATCH /api/admin/bookings/:id/status` | ✔ | `{ status: "in_progress" \| "completed" }` |
-| `GET /api/admin/summary` | ✔ | counts and revenue, overall and per branch |
+| `GET /api/admin/summary` | ✔ | booking and job counts, overall and per branch (no money totals) |
 | `GET /api/admin/system-info` | ✔ | versions, database file and size, counts |
 
 Send the token as `Authorization: Bearer <token>`.

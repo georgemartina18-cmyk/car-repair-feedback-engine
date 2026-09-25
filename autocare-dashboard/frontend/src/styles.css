@@ -185,11 +185,8 @@ th.num .sort-btn { justify-content: flex-end; }
 /* ---------- Summary ---------- */
 .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
 .stat { padding: 18px; border-top: 4px solid var(--navy); }
-.stat-wide { grid-column: 1 / -1; background: var(--navy); color: #fff; border-top-color: var(--orange); }
-.stat-wide .stat-label, .stat-wide .stat-sub { color: #b8c7d8; }
 .stat-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); font-weight: 600; }
 .stat-value { font-size: 2rem; font-weight: 800; color: var(--navy); line-height: 1.2; margin: 4px 0; word-break: break-word; }
-.stat-wide .stat-value { color: #fff; }
 .stat-sub { font-size: 0.85rem; color: var(--muted); }
 .stat-pending { border-top-color: #f59e0b; }
 .stat-completed { border-top-color: var(--done); }
@@ -197,7 +194,6 @@ th.num .sort-btn { justify-content: flex-end; }
 .branch-card { padding: 18px; }
 .branch-card-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
 .branch-card h3 { margin: 0; font-size: 1.1rem; }
-.branch-revenue { font-size: 1.5rem; font-weight: 800; color: var(--orange-dark); margin-top: 8px; }
 .progress { display: flex; height: 8px; border-radius: 999px; overflow: hidden; background: #e5e9ef; margin: 14px 0; }
 .p-completed { background: var(--done); }
 .p-progress { background: #3b82f6; }
