@@ -31,6 +31,21 @@ Your instance is **n8n Cloud**, at `https://eastemade.app.n8n.cloud`. Everything
 | Importing | Workflows → **Import from File** for each file in `workflows/`, or use `scripts/deploy-n8n.js` with `N8N_URL=https://eastemade.app.n8n.cloud` and an API key (Settings → n8n API). |
 | Error workflow | Set **RFE 00 - Error Alerts** as the error workflow of 01–08 (each workflow → Settings), or let the deploy script do it. |
 
+## 11.2a Supabase: use the **Session pooler**, not the direct host
+
+Supabase's direct host (`db.<project-ref>.supabase.co`) is **IPv6-only**, and n8n Cloud connects over IPv4. With the direct host, the credential test fails with **"Host not found, please check your host name"**. Use the pooler instead. In Supabase, click **Connect** → **Session pooler** and copy the values:
+
+| n8n field | Value |
+|---|---|
+| Host | `aws-0-<region>.pooler.supabase.com` (or `aws-1-…`, exactly as shown under Session pooler) |
+| Database | `postgres` |
+| User | `postgres.<project-ref>`. The `.<project-ref>` suffix is required |
+| Password | your database password (Project Settings → Database → Reset if unknown) |
+| Port | `5432` (session mode) |
+| SSL | `Require` (turn **Ignore SSL issues** on if the test complains about the certificate chain) |
+
+The transaction pooler (port 6543) also works, because every query this system sends is a single self-contained statement. Session mode is the simpler choice.
+
 ## 11.3 Setup checklist for your instance
 
 1. **Create the database** (for example on Supabase: Project → SQL editor). Run, in order: `database/001_schema.sql`, `002_functions.sql`, `003_settings.sql`. Then load your branches and staff (see [02-n8n-setup.md §2.1](02-n8n-setup.md#21-loading-your-organisation)).
