@@ -17,7 +17,19 @@ A web app for a car care and auto repair chain with four branches. Customers boo
 
 ---
 
-## 1. Quick start (3 commands)
+## 1. Quick start
+
+### Windows: double-click to start
+
+1. Install **Node.js LTS** from <https://nodejs.org> (use the default options), once.
+2. Open the `autocare-dashboard` folder and double-click **`START-WINDOWS.bat`**.
+   - The first run installs everything, which takes a few minutes.
+   - Your browser then opens **<http://localhost:4000>**. The admin panel is at **<http://localhost:4000/admin>**.
+3. **Keep the black window open** while you use the app. Closing it stops the app.
+
+> "This site can't be reached / localhost refused to connect" means the app is not running. Start it with `START-WINDOWS.bat` (or the commands below) and keep that window open.
+
+### Any computer: 3 commands
 
 You need **Node.js 20.19 or newer** (22 LTS recommended) from <https://nodejs.org>. Check with `node -v`.
 
@@ -174,6 +186,7 @@ and the backend accepts them in new bookings. Nothing else needs changing: no da
 autocare-dashboard/
 ├── package.json                 root scripts: install / dev / start / test
 ├── README.md
+├── START-WINDOWS.bat          double-click starter for Windows
 ├── backend/
 │   ├── .env.example             all settings, explained
 │   ├── package.json
@@ -284,6 +297,8 @@ Send the token as `Authorization: Bearer <token>`.
 
 | Problem | Fix |
 |---|---|
+| `This site can't be reached` / `localhost refused to connect` | The app isn't running. Double-click `START-WINDOWS.bat` (or run `npm run dev`) and keep that window open. Use port **4000** with `START-WINDOWS.bat`/`npm start`, and port **5173** with `npm run dev`. |
+| PowerShell says "running scripts is disabled" | Use `START-WINDOWS.bat`, or run the commands in **Command Prompt** (cmd) instead of PowerShell. |
 | `Cannot reach the server` on the form | The backend isn't running. Use `npm run dev` (starts both), or start `backend` too. |
 | `EADDRINUSE: port 4000` / `5173` | Another program is using the port. Close it, or set `PORT=4001` in `backend/.env` **and** update the proxy port in `frontend/vite.config.js`. |
 | Forgot admin password | `npm run reset-password -- NewPass123` (server stopped). |
