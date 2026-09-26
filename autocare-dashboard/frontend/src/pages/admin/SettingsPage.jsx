@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { api, setToken } from '../../api.js';
 import { formatTimestamp } from '../../format.js';
+import N8nSettings from './N8nSettings.jsx';
 
 export default function SettingsPage() {
   return (
@@ -10,6 +11,7 @@ export default function SettingsPage() {
         <h1>Settings</h1>
       </div>
       <div className="settings-grid">
+        <N8nSettings />
         <ChangePassword />
         <SystemInfo />
       </div>

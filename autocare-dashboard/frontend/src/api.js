@@ -77,4 +77,10 @@ export const api = {
   setStatus: (id, status) => request('PATCH', `/admin/bookings/${id}/status`, { status }),
   summary: () => request('GET', '/admin/summary'),
   systemInfo: () => request('GET', '/admin/system-info'),
+
+  // n8n integration
+  n8n: () => request('GET', '/admin/integrations/n8n'),
+  saveN8n: (config) => request('PUT', '/admin/integrations/n8n', config),
+  testN8n: () => request('POST', '/admin/integrations/n8n/test'),
+  resendN8n: (id) => request('POST', `/admin/integrations/n8n/deliveries/${id}/resend`),
 };

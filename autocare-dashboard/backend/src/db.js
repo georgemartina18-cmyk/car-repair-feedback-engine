@@ -38,6 +38,26 @@ CREATE INDEX IF NOT EXISTS idx_bookings_status    ON bookings (status);
 CREATE INDEX IF NOT EXISTS idx_bookings_scheduled ON bookings (scheduled_date);
 CREATE INDEX IF NOT EXISTS idx_bookings_created   ON bookings (created_at);
 
+-- Simple key/value settings changed from the admin panel (e.g. the n8n webhook).
+CREATE TABLE IF NOT EXISTS settings (
+  key   TEXT PRIMARY KEY,
+  value TEXT NOT NULL                               -- JSON
+);
+
+-- One row per webhook sent to n8n, newest kept (see webhook.js).
+CREATE TABLE IF NOT EXISTS webhook_deliveries (
+  id           INTEGER PRIMARY KEY AUTOINCREMENT,
+  event        TEXT NOT NULL,                       -- job.completed | test
+  booking_ref  TEXT,
+  status       TEXT NOT NULL,                       -- sending | success | failed
+  http_status  INTEGER,
+  error        TEXT,
+  attempts     INTEGER NOT NULL DEFAULT 0,
+  payload      TEXT NOT NULL,                       -- JSON body that was sent
+  created_at   TEXT NOT NULL,
+  updated_at   TEXT NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS admin_users (
   id                  INTEGER PRIMARY KEY AUTOINCREMENT,
   email               TEXT NOT NULL UNIQUE,

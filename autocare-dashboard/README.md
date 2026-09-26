@@ -180,6 +180,42 @@ and the backend accepts them in new bookings. Nothing else needs changing: no da
 
 ---
 
+## 5b. Connecting to n8n (runs a workflow when a job is completed)
+
+When you click **Mark as Completed**, the dashboard can send the job's details to an n8n workflow through a Webhook node.
+
+1. In n8n, add a **Webhook** node (HTTP method **POST**) as the first node of your workflow. If you use the Reputation & Feedback engine, its *Job completed* workflow already has one.
+2. Copy the webhook's **Production URL** (it contains `/webhook/`). The *Test URL* (`/webhook-test/`) only works right after you click **Listen for test event** in n8n, so use it only for a quick test.
+3. **Activate** (publish) the workflow in n8n. Production URLs only answer while the workflow is active.
+4. In the dashboard: **Settings → n8n integration** → paste the URL → tick **Send completed jobs to n8n** → **Save** → **Send test**. In n8n, the test shows up under **Executions**.
+5. If the Webhook node uses **Header Auth**, type the same header name and value into the dashboard (for the Reputation engine: `X-RFE-Key` and your intake key).
+
+Sending happens in the background, so it never slows down "Mark as Completed". If n8n doesn't answer, it retries twice (after 5 s and 30 s). **Recent deliveries** in Settings shows each send, the reason if it failed, and a **Resend** button.
+
+**What n8n receives** (JSON body; the field names match the Reputation engine's intake):
+
+```json
+{
+  "event": "job.completed",
+  "test": false,
+  "source_system": "autocare-dashboard",
+  "job_id": "AUTO-260926-0001",
+  "booking_ref": "AUTO-260926-0001",
+  "branch_id": "OSH",
+  "branch_name": "Oshodi Branch",
+  "status": "completed",
+  "completed_at": "2026-09-26T05:44:27.241Z",
+  "scheduled_date": "2026-10-01 16:45",
+  "booked_at": "2026-09-26T04:48:23.698Z",
+  "service_type": "Electrical Diagnostics",
+  "notes": "Please call before starting any extra work.",
+  "amount_paid": 56500,
+  "customer": { "name": "Halima Lawal", "phone": "+234 805 521 6674", "email": "halima.lawal53@example.com" }
+}
+```
+
+In n8n, read the fields as `{{ $json.body.customer.phone }}`, `{{ $json.body.booking_ref }}` and so on. Events sent with **Send test** have `"test": true`, so a workflow can skip them with an IF node. Branch codes (`branch_id`) are set in `BRANCH_CODES` in `backend/src/options.js`.
+
 ## 6. Project structure
 
 ```
@@ -199,6 +235,7 @@ autocare-dashboard/
 │   │   ├── auth.js              admin accounts, password hashing, JWT, requireAdmin
 │   │   ├── bookings.js          validation, booking ref numbers, status changes
 │   │   ├── seed.js              sample data
+│   │   ├── webhook.js           n8n integration: sends completed jobs to a webhook
 │   │   ├── utils/time.js        "today" / "this week" in the business time zone
 │   │   └── routes/
 │   │       ├── public.js        GET /api/options, POST /api/bookings
@@ -279,6 +316,9 @@ The database is one SQLite file: `backend/data/autocare.sqlite`. **To back up, c
 | `PATCH /api/admin/bookings/:id/status` | ✔ | `{ status: "in_progress" \| "completed" }` |
 | `GET /api/admin/summary` | ✔ | booking and job counts, overall and per branch (no money totals) |
 | `GET /api/admin/system-info` | ✔ | versions, database file and size, counts |
+| `GET` / `PUT /api/admin/integrations/n8n` | ✔ | n8n webhook settings + recent deliveries / save settings |
+| `POST /api/admin/integrations/n8n/test` | ✔ | send a sample `job.completed` event (`"test": true`) |
+| `POST /api/admin/integrations/n8n/deliveries/:id/resend` | ✔ | resend a failed delivery |
 
 Send the token as `Authorization: Bearer <token>`.
 

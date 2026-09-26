@@ -8,6 +8,7 @@ const db = require('../db');
 const config = require('../config');
 const { BRANCHES, STATUSES } = require('../options');
 const { updateStatus } = require('../bookings');
+const webhook = require('../webhook');
 const { requireAdmin } = require('../auth');
 const { dateStrInTz, startOfDayUtc, startOfWeek, addDays } = require('../utils/time');
 const pkg = require('../../package.json');
@@ -70,7 +71,37 @@ router.patch('/bookings/:id/status', (req, res) => {
   if (!Number.isInteger(id)) return res.status(400).json({ error: 'Invalid booking id.' });
   const result = updateStatus(id, req.body?.status);
   if (result.error) return res.status(result.code).json({ error: result.error, booking: result.booking });
+  // Tell n8n (if set up in Settings). Runs in the background; the admin doesn't wait for it.
+  if (result.booking.status === 'completed') webhook.notifyJobCompleted(result.booking);
   res.json({ booking: result.booking });
+});
+
+/* ---------- n8n integration (Settings page) ---------- */
+
+/** GET /api/admin/integrations/n8n: saved settings (without the secret) and recent deliveries. */
+router.get('/integrations/n8n', (req, res) => {
+  res.json({ config: webhook.getPublicConfig(), deliveries: webhook.recentDeliveries() });
+});
+
+/** PUT /api/admin/integrations/n8n  body: { enabled, url, headerName, headerValue, clearHeaderValue } */
+router.put('/integrations/n8n', (req, res) => {
+  const result = webhook.saveConfig(req.body || {});
+  if (result.error) return res.status(400).json({ error: result.error });
+  res.json({ config: result.config });
+});
+
+/** POST /api/admin/integrations/n8n/test: send a sample "job completed" event now. */
+router.post('/integrations/n8n/test', async (req, res) => {
+  const result = await webhook.sendTest();
+  if (result.error) return res.status(400).json({ error: result.error });
+  res.json(result);
+});
+
+/** POST /api/admin/integrations/n8n/deliveries/:id/resend */
+router.post('/integrations/n8n/deliveries/:id/resend', async (req, res) => {
+  const result = await webhook.resend(Number(req.params.id));
+  if (result.error) return res.status(400).json({ error: result.error });
+  res.json(result);
 });
 
 /** GET /api/admin/summary: numbers for the Branch Summary page. */

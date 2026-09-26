@@ -30,6 +30,16 @@ const SERVICES = [
 // Shown in the "Select Branch" dropdown and used for the branch summary cards.
 const BRANCHES = ['Ikeja Branch', 'Lekki Branch', 'Ikorodu Branch', 'Oshodi Branch'];
 
+// Short code per branch, sent to n8n as "branch_id" when a job is completed.
+// If you use the Reputation & Feedback engine, these must match the "code"
+// column of its branches table. Add a code here when you add a branch.
+const BRANCH_CODES = {
+  'Ikeja Branch': 'IKJ',
+  'Lekki Branch': 'LKK',
+  'Ikorodu Branch': 'IKD',
+  'Oshodi Branch': 'OSH',
+};
+
 // Job statuses. The keys are what is stored in the database; the labels are
 // what people see.
 const STATUSES = {
@@ -41,4 +51,4 @@ const STATUSES = {
 // Customers can only pick a time inside these hours (24-hour clock, branch time).
 const BUSINESS_HOURS = { open: '08:00', close: '18:00' };
 
-module.exports = { SERVICES, BRANCHES, STATUSES, BUSINESS_HOURS };
+module.exports = { SERVICES, BRANCHES, BRANCH_CODES, STATUSES, BUSINESS_HOURS };
