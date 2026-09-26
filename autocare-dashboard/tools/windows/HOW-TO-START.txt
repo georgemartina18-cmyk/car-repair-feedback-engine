@@ -1,0 +1,32 @@
+AUTOCARE CHAIN DASHBOARD - HOW TO START
+=======================================
+
+Nothing needs to be installed. Everything is inside this folder.
+
+TO START
+  1. Double-click  START-AutoCare.bat
+     (If Windows shows "Windows protected your PC", click "More info",
+      then "Run anyway". If a firewall box appears, click "Allow access".)
+  2. A black window opens and your browser opens by itself.
+     KEEP THE BLACK WINDOW OPEN while you use the app.
+
+THE ADDRESSES (type them in Chrome's address bar)
+  Booking form (for customers):  http://localhost:4000
+  Admin panel (for you):         http://localhost:4000/admin
+
+ADMIN LOGIN
+  Email:     admin@autocare.local
+  Password:  Admin@12345
+  After logging in, click "Settings" at the top and change the password.
+
+TO STOP
+  Close the black window.
+
+NEXT TIME
+  Just double-click START-AutoCare.bat again. Your bookings are saved
+  in the folder app\backend\data - do not delete it.
+  Tip: right-click START-AutoCare.bat > "Send to" > "Desktop (create shortcut)"
+  to put a start icon on your desktop.
+
+"This site can't be reached"?
+  The black window is not open. Double-click START-AutoCare.bat again.

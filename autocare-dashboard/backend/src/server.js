@@ -22,9 +22,19 @@ async function main() {
     if (added) console.log(`Loaded ${added} sample bookings.`);
   }
 
-  createApp().listen(config.PORT, () => {
-    console.log(`AutoCare API running on http://localhost:${config.PORT}`);
+  const server = createApp().listen(config.PORT, () => {
+    console.log(`AutoCare running on http://localhost:${config.PORT}`);
     console.log(`Database file: ${config.DB_FILE}`);
+  });
+  server.on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+      console.error(`\nPort ${config.PORT} is already in use. The app is probably already running in another window:`);
+      console.error(`open http://localhost:${config.PORT} in your browser, or close the other window and try again.`);
+      console.error('(To use a different port, set PORT in backend/.env.)\n');
+    } else {
+      console.error('Failed to start the server:', err);
+    }
+    process.exit(1);
   });
 }
 

@@ -3,3 +3,4 @@ node_modules/
 backend/data/
 frontend/dist/
 *.log
+dist-windows/
