@@ -99,6 +99,8 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--o
 .header-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .header-link { color: #d6e2ef; font-size: 0.9rem; text-decoration: none; border: 1px solid #3a5878; padding: 0.35rem 0.8rem; border-radius: 6px; }
 .header-link:hover { color: #fff; border-color: #fff; }
+.admin-preview-bar { background: #fff4ec; color: var(--navy); text-align: center; font-size: 0.9rem; padding: 8px 16px; border-bottom: 1px solid #ffd3b0; }
+.admin-preview-bar a { color: var(--orange-dark); font-weight: 700; }
 .hero {
   background: linear-gradient(135deg, var(--navy) 0%, var(--navy-2) 100%);
   color: #e7eef6; padding: 28px 0 88px;

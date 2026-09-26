@@ -6,7 +6,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Brand from '../components/Brand.jsx';
-import { api } from '../api.js';
+import { api, getToken } from '../api.js';
 import { formatNaira, formatScheduled, todayLocal } from '../format.js';
 
 const EMPTY_FORM = {
@@ -30,6 +30,7 @@ export default function BookingPage() {
   const [submitting, setSubmitting] = useState(false);
   const [confirmation, setConfirmation] = useState(null);
   const successRef = useRef(null);
+  const adminLoggedIn = Boolean(getToken());
 
   useEffect(() => {
     api.options().then(setOptions).catch((err) => setLoadError(err.message));
@@ -72,11 +73,19 @@ export default function BookingPage() {
       <header className="public-header">
         <div className="container header-row">
           <Brand subtitle="Car care & auto repair · Lagos" />
+          {/* Logged-in admins see a way back to the dashboard, so the public
+              page doesn't look like they were logged out. */}
           <Link to="/admin" className="header-link">
-            Staff login
+            {adminLoggedIn ? '← Admin dashboard' : 'Staff login'}
           </Link>
         </div>
       </header>
+      {adminLoggedIn && (
+        <div className="admin-preview-bar">
+          You are logged in as admin. This is the public booking form your customers see.{' '}
+          <Link to="/admin">Back to the dashboard</Link>
+        </div>
+      )}
 
       <section className="hero">
         <div className="container">
