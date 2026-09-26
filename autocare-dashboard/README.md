@@ -184,7 +184,7 @@ and the backend accepts them in new bookings. Nothing else needs changing: no da
 
 When you click **Mark as Completed**, the dashboard can send the job's details to an n8n workflow through a Webhook node.
 
-1. In n8n, add a **Webhook** node (HTTP method **POST**) as the first node of your workflow. If you use the Reputation & Feedback engine, its *Job completed* workflow already has one.
+1. In n8n, add a **Webhook** node as the first node of your workflow and set its **HTTP Method to POST** (the default GET will not receive anything). If you use the Reputation & Feedback engine, its *Job completed* workflow already has one.
 2. Copy the webhook's **Production URL** (it contains `/webhook/`). The *Test URL* (`/webhook-test/`) only works right after you click **Listen for test event** in n8n, so use it only for a quick test.
 3. **Activate** (publish) the workflow in n8n. Production URLs only answer while the workflow is active.
 4. In the dashboard: **Settings → n8n integration** → paste the URL → tick **Send completed jobs to n8n** → **Save** → **Send test**. In n8n, the test shows up under **Executions**.

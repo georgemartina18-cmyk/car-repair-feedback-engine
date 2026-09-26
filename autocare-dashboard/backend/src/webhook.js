@@ -146,6 +146,10 @@ async function postOnce(config, payload) {
 /** Turn n8n's error codes into plain advice. */
 function explainHttpError(status, url, body) {
   const isTestUrl = url.includes('/webhook-test/');
+  // n8n says "This webhook is not registered for POST requests" when the node is set to GET.
+  if (status === 404 && /not registered for POST/i.test(body)) {
+    return 'n8n answered 404: the Webhook node is set to GET. In n8n, set the Webhook node\'s "HTTP Method" to POST.';
+  }
   if (status === 404 && isTestUrl) {
     return 'n8n answered 404. Test URLs only work right after you click "Listen for test event" in n8n. Use the Production URL for real use.';
   }

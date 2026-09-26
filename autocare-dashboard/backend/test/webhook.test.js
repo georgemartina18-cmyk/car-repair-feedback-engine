@@ -21,6 +21,7 @@ let fakeN8n;
 let n8nUrl;
 let received = [];
 let n8nStatus = 200; // what the fake n8n answers
+let n8nBody = '{"message":"Workflow was started"}';
 
 async function call(method, path, body) {
   const res = await fetch(base + path, {
@@ -53,7 +54,7 @@ before(async () => {
     req.on('end', () => {
       received.push({ headers: req.headers, body: JSON.parse(data) });
       res.writeHead(n8nStatus, { 'Content-Type': 'application/json' });
-      res.end('{"message":"Workflow was started"}');
+      res.end(n8nBody);
     });
   });
   await new Promise((r) => fakeN8n.listen(0, r));
@@ -148,4 +149,13 @@ test('a 404 (inactive workflow) is not retried and explains why', async () => {
   assert.match(res.body.delivery.error, /not active/);
   assert.equal(received.length, 1);
   n8nStatus = 200;
+});
+
+test('a webhook set to GET gets a clear "set it to POST" message', async () => {
+  n8nStatus = 404;
+  n8nBody = '{"code":404,"message":"This webhook is not registered for POST requests. Did you mean to make a GET request?"}';
+  const res = await call('POST', '/admin/integrations/n8n/test');
+  assert.match(res.body.delivery.error, /set the Webhook node's "HTTP Method" to POST/);
+  n8nStatus = 200;
+  n8nBody = '{}';
 });
