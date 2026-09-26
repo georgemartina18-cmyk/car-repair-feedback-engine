@@ -1,7 +1,8 @@
 AUTOCARE CHAIN DASHBOARD - HOW TO START
 =======================================
 
-Nothing needs to be installed. Everything is inside this folder.
+Nothing needs to be installed. The first start downloads the app engine
+(about 85 MB, a few minutes) - the computer must be online for that.
 
 TO START
   1. Double-click  START-AutoCare.bat
