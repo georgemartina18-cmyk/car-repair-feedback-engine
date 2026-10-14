@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Little Treasures GH | Kids Clothing &amp; Accessories in Ghana</title>
+  <meta name="description" content="Shop quality kids' clothes, baby wear, shoes, accessories and essentials in Ghana. Order on WhatsApp, pay with Mobile Money, nationwide delivery." />
+  <meta property="og:title" content="Little Treasures GH — Kids Clothing &amp; Accessories" />
+  <meta property="og:description" content="Baby wear, girls &amp; boys clothing, shoes and accessories. Delivery across Ghana." />
+  <meta property="og:type" content="website" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧸</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- Top announcement bar -->
+  <div class="topbar">🚚 Delivery across Ghana &nbsp;•&nbsp; 💳 Pay with Mobile Money &nbsp;•&nbsp; 💬 Order easily on WhatsApp</div>
+
+  <!-- Header -->
+  <header class="header" id="top">
+    <div class="container header__inner">
+      <a href="#top" class="logo"><span class="logo__icon">🧸</span><span data-shop="name">Little Treasures GH</span></a>
+      <nav class="nav" id="nav">
+        <a href="#shop">Shop</a>
+        <a href="#categories">Categories</a>
+        <a href="#about">About</a>
+        <a href="#delivery">Delivery</a>
+        <a href="#contact">Contact</a>
+      </nav>
+      <div class="header__actions">
+        <button class="cart-btn" id="openCart" aria-label="Open cart">
+          🛍️ <span class="cart-count" id="cartCount">0</span>
+        </button>
+        <button class="menu-btn" id="menuBtn" aria-label="Open menu">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container hero__inner">
+      <div class="hero__text">
+        <span class="pill">✨ New arrivals every week</span>
+        <h1>Cute, comfy &amp; quality<br /><span class="hl">kids' fashion</span> in Ghana</h1>
+        <p data-shop="tagline">Everything your little one needs — from newborn to 12 years.</p>
+        <div class="hero__cta">
+          <a href="#shop" class="btn btn--primary">Shop Now</a>
+          <a href="#" class="btn btn--ghost" data-wa="Hello! I'd like to make an enquiry.">💬 Chat on WhatsApp</a>
+        </div>
+        <ul class="hero__trust">
+          <li><strong>500+</strong><span>Happy parents</span></li>
+          <li><strong>16</strong><span>Regions delivered</span></li>
+          <li><strong>4.9★</strong><span>Customer rating</span></li>
+        </ul>
+      </div>
+      <div class="hero__art" aria-hidden="true">
+        <div class="blob blob--1"></div>
+        <div class="blob blob--2"></div>
+        <div class="hero__card hero__card--a">👗<span>Dresses</span></div>
+        <div class="hero__card hero__card--b">👶<span>Baby wear</span></div>
+        <div class="hero__card hero__card--c">👟<span>Shoes</span></div>
+        <div class="hero__card hero__card--d">🎀<span>Accessories</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Categories -->
+  <section class="section" id="categories">
+    <div class="container">
+      <div class="section__head">
+        <h2>Shop by category</h2>
+        <p>Find the perfect pieces for every age and every occasion.</p>
+      </div>
+      <div class="cats">
+        <button class="cat" data-filter="baby"><span class="cat__icon c1">👶</span>Baby (0–24m)</button>
+        <button class="cat" data-filter="girls"><span class="cat__icon c2">👗</span>Girls</button>
+        <button class="cat" data-filter="boys"><span class="cat__icon c3">👕</span>Boys</button>
+        <button class="cat" data-filter="shoes"><span class="cat__icon c4">👟</span>Shoes</button>
+        <button class="cat" data-filter="accessories"><span class="cat__icon c5">🎀</span>Accessories</button>
+        <button class="cat" data-filter="essentials"><span class="cat__icon c6">🍼</span>Essentials</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Products -->
+  <section class="section section--tint" id="shop">
+    <div class="container">
+      <div class="section__head">
+        <h2>Our collection</h2>
+        <p>Tap <strong>Add to bag</strong>, then send your order to us on WhatsApp in one click.</p>
+      </div>
+      <div class="filters" id="filters">
+        <button class="chip is-active" data-filter="all">All</button>
+        <button class="chip" data-filter="baby">Baby</button>
+        <button class="chip" data-filter="girls">Girls</button>
+        <button class="chip" data-filter="boys">Boys</button>
+        <button class="chip" data-filter="shoes">Shoes</button>
+        <button class="chip" data-filter="accessories">Accessories</button>
+        <button class="chip" data-filter="essentials">Essentials</button>
+      </div>
+      <div class="grid" id="productGrid"></div>
+    </div>
+  </section>
+
+  <!-- Why us -->
+  <section class="section">
+    <div class="container features">
+      <div class="feature"><span>🧵</span><h3>Quality fabrics</h3><p>Soft, breathable and gentle on delicate skin — made to last.</p></div>
+      <div class="feature"><span>💸</span><h3>Fair prices</h3><p>Great styles that don't break the bank. Bundle deals available.</p></div>
+      <div class="feature"><span>🚚</span><h3>Fast delivery</h3><p>Same/next-day in Accra, 1–3 days to other regions.</p></div>
+      <div class="feature"><span>🤝</span><h3>Trusted seller</h3><p>Hundreds of happy parents — see us on TikTok!</p></div>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section class="section section--tint" id="about">
+    <div class="container about">
+      <div class="about__img" aria-hidden="true"><span>🧸</span></div>
+      <div>
+        <h2>About us</h2>
+        <p>We are a Ghanaian kids' store passionate about dressing little ones in clothes that are comfortable, stylish and affordable. From newborn essentials to party outfits, school bags to shoes, we hand-pick every item with love.</p>
+        <p>Follow us on TikTok to see our latest arrivals, try-ons and customer unboxings.</p>
+        <a href="#" class="btn btn--primary" data-social="tiktok" target="_blank" rel="noopener">Follow on TikTok</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- How to order / Delivery -->
+  <section class="section" id="delivery">
+    <div class="container">
+      <div class="section__head">
+        <h2>How to order</h2>
+        <p>Simple, safe and fast.</p>
+      </div>
+      <ol class="steps">
+        <li><span>1</span><h3>Pick your items</h3><p>Add products to your bag and choose sizes.</p></li>
+        <li><span>2</span><h3>Send on WhatsApp</h3><p>Your order is sent to us automatically — we confirm availability.</p></li>
+        <li><span>3</span><h3>Pay with MoMo</h3><p>MTN MoMo, Telecel Cash, AT Money or cash on delivery (Accra).</p></li>
+        <li><span>4</span><h3>Receive &amp; enjoy</h3><p>We deliver to your door or a station near you.</p></li>
+      </ol>
+      <div class="delivery-table">
+        <div><strong>Accra &amp; Tema</strong><span>Same / next day</span></div>
+        <div><strong>Kumasi, Takoradi, Cape Coast</strong><span>1–2 days</span></div>
+        <div><strong>Other regions</strong><span>2–3 days</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section class="section section--tint">
+    <div class="container">
+      <div class="section__head"><h2>What parents say</h2></div>
+      <div class="reviews">
+        <blockquote><p>“The quality is amazing and delivery to Kumasi was so fast. My daughter loves her dress!”</p><cite>— Akosua, Kumasi</cite></blockquote>
+        <blockquote><p>“Bought a full newborn set as a gift. Beautifully packaged. Will definitely buy again.”</p><cite>— Efua, Accra</cite></blockquote>
+        <blockquote><p>“Ordering on WhatsApp was easy and she replied quickly. Highly recommended.”</p><cite>— Kwame, Tema</cite></blockquote>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section class="section" id="contact">
+    <div class="container contact">
+      <div>
+        <h2>Get in touch</h2>
+        <p>Questions about sizes, stock or bulk orders? We're happy to help.</p>
+        <ul class="contact__list">
+          <li>📍 <span data-shop="location">Accra, Ghana</span></li>
+          <li>📞 <span data-shop="phoneDisplay"></span></li>
+          <li>✉️ <span data-shop="email"></span></li>
+          <li>🕘 <span data-shop="hours"></span></li>
+        </ul>
+        <a href="#" class="btn btn--wa" data-wa="Hello! I have a question.">💬 Message us on WhatsApp</a>
+      </div>
+      <form class="contact__form" id="contactForm">
+        <label>Your name<input name="name" required /></label>
+        <label>Your message<textarea name="message" rows="4" required placeholder="e.g. Do you have the floral dress in size 4?"></textarea></label>
+        <button class="btn btn--primary" type="submit">Send via WhatsApp</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer__inner">
+      <div>
+        <a href="#top" class="logo logo--light"><span class="logo__icon">🧸</span><span data-shop="name"></span></a>
+        <p>Quality kids' clothing &amp; accessories, delivered across Ghana.</p>
+      </div>
+      <div class="footer__links">
+        <a href="#shop">Shop</a><a href="#about">About</a><a href="#delivery">Delivery</a><a href="#contact">Contact</a>
+      </div>
+      <div class="footer__social" id="footerSocial"></div>
+    </div>
+    <p class="footer__copy">© <span id="year"></span> <span data-shop="name"></span>. All rights reserved.</p>
+  </footer>
+
+  <!-- Floating WhatsApp button -->
+  <a href="#" class="wa-float" data-wa="Hello! I'd like to order." aria-label="Chat on WhatsApp">
+    <svg viewBox="0 0 32 32" width="30" height="30" fill="#fff"><path d="M16 3C9 3 3.3 8.6 3.3 15.6c0 2.5.7 4.8 2 6.8L3 29l6.8-2.2c1.9 1 4 1.6 6.2 1.6 7 0 12.7-5.6 12.7-12.6S23 3 16 3zm0 23c-2 0-3.9-.6-5.5-1.6l-.4-.2-4 1.3 1.3-3.9-.3-.4a10.3 10.3 0 0 1-1.6-5.5C5.5 9.9 10.2 5.3 16 5.3s10.5 4.6 10.5 10.3S21.8 26 16 26zm5.8-7.7c-.3-.2-1.9-.9-2.2-1-.3-.1-.5-.2-.7.2-.2.3-.8 1-1 1.2-.2.2-.4.2-.7.1-.3-.2-1.3-.5-2.6-1.6-1-.9-1.6-1.9-1.8-2.2-.2-.3 0-.5.1-.7l.5-.6.3-.5c.1-.2 0-.4 0-.6l-1-2.4c-.3-.6-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.4-.3.3-1.2 1.1-1.2 2.8s1.2 3.2 1.4 3.5c.2.2 2.4 3.6 5.8 5 .8.4 1.4.6 1.9.7.8.3 1.5.2 2.1.1.6-.1 1.9-.8 2.2-1.5.3-.7.3-1.4.2-1.5-.1-.2-.3-.3-.6-.4z"/></svg>
+  </a>
+
+  <!-- Cart drawer -->
+  <div class="overlay" id="overlay"></div>
+  <aside class="cart" id="cart" aria-label="Shopping bag">
+    <div class="cart__head">
+      <h3>Your bag</h3>
+      <button id="closeCart" aria-label="Close cart">✕</button>
+    </div>
+    <div class="cart__items" id="cartItems"></div>
+    <div class="cart__foot">
+      <div class="cart__total"><span>Total</span><strong id="cartTotal">GH₵ 0</strong></div>
+      <p class="cart__note">Delivery fee is confirmed on WhatsApp based on your location.</p>
+      <button class="btn btn--wa btn--block" id="checkout">💬 Send order on WhatsApp</button>
+    </div>
+  </aside>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="js/config.js"></script>
+  <script src="js/products.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
