@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Little Treasures GH | Kids Clothing &amp; Accessories in Ghana</title>
+  <title>ABICEE KIDS | Kids Clothing, Shoes &amp; Accessories in Ghana</title>
   <meta name="description" content="Shop quality kids' clothes, baby wear, shoes, accessories and essentials in Ghana. Order on WhatsApp, pay with Mobile Money, nationwide delivery." />
-  <meta property="og:title" content="Little Treasures GH — Kids Clothing &amp; Accessories" />
+  <meta property="og:title" content="ABICEE KIDS — Kids Clothing &amp; Accessories in Ghana" />
   <meta property="og:description" content="Baby wear, girls &amp; boys clothing, shoes and accessories. Delivery across Ghana." />
   <meta property="og:type" content="website" />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧸</text></svg>" />
+  <link rel="icon" href="images/logo-mark.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet" />
@@ -22,7 +22,7 @@
   <!-- Header -->
   <header class="header" id="top">
     <div class="container header__inner">
-      <a href="#top" class="logo"><span class="logo__icon">🧸</span><span data-shop="name">Little Treasures GH</span></a>
+      <a href="#top" class="logo"><img src="images/logo-mark.svg" alt="" class="logo__mark" /><span class="logo__word">ABICEE<span>KIDS</span></span></a>
       <nav class="nav" id="nav">
         <a href="#shop">Shop</a>
         <a href="#categories">Categories</a>
@@ -45,7 +45,7 @@
       <div class="hero__text">
         <span class="pill">✨ New arrivals every week</span>
         <h1>Cute, comfy &amp; quality<br /><span class="hl">kids' fashion</span> in Ghana</h1>
-        <p data-shop="tagline">Everything your little one needs — from newborn to 12 years.</p>
+        <p data-shop="tagline"></p>
         <div class="hero__cta">
           <a href="#shop" class="btn btn--primary">Shop Now</a>
           <a href="#" class="btn btn--ghost" data-wa="Hello! I'd like to make an enquiry.">💬 Chat on WhatsApp</a>
@@ -59,10 +59,10 @@
       <div class="hero__art" aria-hidden="true">
         <div class="blob blob--1"></div>
         <div class="blob blob--2"></div>
-        <div class="hero__card hero__card--a">👗<span>Dresses</span></div>
-        <div class="hero__card hero__card--b">👶<span>Baby wear</span></div>
-        <div class="hero__card hero__card--c">👟<span>Shoes</span></div>
-        <div class="hero__card hero__card--d">🎀<span>Accessories</span></div>
+        <div class="hero__card hero__card--a"><img src="images/products/floral-party-dress.svg" alt="" /><span>Dresses</span></div>
+        <div class="hero__card hero__card--b"><img src="images/products/baby-romper-set.svg" alt="" /><span>Baby wear</span></div>
+        <div class="hero__card hero__card--c"><img src="images/products/light-up-sneakers.svg" alt="" /><span>Shoes</span></div>
+        <div class="hero__card hero__card--d"><img src="images/products/boys-ankara-kaftan.svg" alt="" /><span>Ankara</span></div>
       </div>
     </div>
   </section>
@@ -121,7 +121,7 @@
       <div class="about__img" aria-hidden="true"><span>🧸</span></div>
       <div>
         <h2>About us</h2>
-        <p>We are a Ghanaian kids' store passionate about dressing little ones in clothes that are comfortable, stylish and affordable. From newborn essentials to party outfits, school bags to shoes, we hand-pick every item with love.</p>
+        <p><strong>ABICEE KIDS</strong> is a Ghanaian kids' store passionate about dressing little ones in clothes that are comfortable, stylish and affordable. From newborn essentials to party outfits, school bags to shoes, we hand-pick every item with love.</p>
         <p>Follow us on TikTok to see our latest arrivals, try-ons and customer unboxings.</p>
         <a href="#" class="btn btn--primary" data-social="tiktok" target="_blank" rel="noopener">Follow on TikTok</a>
       </div>
@@ -139,13 +139,11 @@
         <li><span>1</span><h3>Pick your items</h3><p>Add products to your bag and choose sizes.</p></li>
         <li><span>2</span><h3>Send on WhatsApp</h3><p>Your order is sent to us automatically — we confirm availability.</p></li>
         <li><span>3</span><h3>Pay with MoMo</h3><p>MTN MoMo, Telecel Cash, AT Money or cash on delivery (Accra).</p></li>
-        <li><span>4</span><h3>Receive &amp; enjoy</h3><p>We deliver to your door or a station near you.</p></li>
+        <li><span>4</span><h3>Receive &amp; enjoy</h3><p>Doorstep in Accra; nearest station or courier point elsewhere.</p></li>
       </ol>
-      <div class="delivery-table">
-        <div><strong>Accra &amp; Tema</strong><span>Same / next day</span></div>
-        <div><strong>Kumasi, Takoradi, Cape Coast</strong><span>1–2 days</span></div>
-        <div><strong>Other regions</strong><span>2–3 days</span></div>
-      </div>
+      <h3 class="zones__title">📦 Delivery across all 16 regions of Ghana <small>(dispatched from Accra)</small></h3>
+      <div class="zones" id="deliveryZones"></div>
+      <p class="zones__note">Outside Greater Accra, parcels travel by trusted bus/courier services (e.g. VIP, STC) to your nearest station or doorstep. You'll get a call when it arrives.</p>
     </div>
   </section>
 
@@ -170,7 +168,7 @@
         <ul class="contact__list">
           <li>📍 <span data-shop="location">Accra, Ghana</span></li>
           <li>📞 <span data-shop="phoneDisplay"></span></li>
-          <li>✉️ <span data-shop="email"></span></li>
+          <li id="emailRow">✉️ <span data-shop="email"></span></li>
           <li>🕘 <span data-shop="hours"></span></li>
         </ul>
         <a href="#" class="btn btn--wa" data-wa="Hello! I have a question.">💬 Message us on WhatsApp</a>
@@ -187,7 +185,7 @@
   <footer class="footer">
     <div class="container footer__inner">
       <div>
-        <a href="#top" class="logo logo--light"><span class="logo__icon">🧸</span><span data-shop="name"></span></a>
+        <a href="#top" class="logo logo--light"><img src="images/logo-mark.svg" alt="" class="logo__mark" /><span class="logo__word">ABICEE<span>KIDS</span></span></a>
         <p>Quality kids' clothing &amp; accessories, delivered across Ghana.</p>
       </div>
       <div class="footer__links">
@@ -212,8 +210,15 @@
     </div>
     <div class="cart__items" id="cartItems"></div>
     <div class="cart__foot">
+      <form class="cart__form" id="orderForm" novalidate>
+        <input name="name" placeholder="Your name" autocomplete="name" />
+        <select name="zone" id="zoneSelect"><option value="">Choose delivery area…</option></select>
+        <input name="area" placeholder="Town / area &amp; landmark (e.g. Madina, near Zongo junction)" />
+      </form>
+      <div class="cart__line"><span>Subtotal</span><span id="cartSubtotal">GH₵ 0</span></div>
+      <div class="cart__line"><span>Delivery</span><span id="cartDelivery">—</span></div>
       <div class="cart__total"><span>Total</span><strong id="cartTotal">GH₵ 0</strong></div>
-      <p class="cart__note">Delivery fee is confirmed on WhatsApp based on your location.</p>
+      <p class="cart__note">Pay with MoMo after we confirm your order on WhatsApp.</p>
       <button class="btn btn--wa btn--block" id="checkout">💬 Send order on WhatsApp</button>
     </div>
   </aside>

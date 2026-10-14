@@ -13,6 +13,7 @@
 
   // ---------- Shop details ----------
   $$("[data-shop]").forEach((el) => { el.textContent = SHOP[el.dataset.shop] || el.textContent; });
+  if (!SHOP.email) $("#emailRow").remove();
   $("#year").textContent = new Date().getFullYear();
 
   const waLink = (text) => `https://wa.me/${SHOP.whatsapp}?text=${encodeURIComponent(text)}`;
@@ -31,6 +32,16 @@
     .filter(([, url]) => url)
     .map(([k, url]) => `<a href="${url}" target="_blank" rel="noopener">${names[k] || k}</a>`)
     .join("");
+
+  // ---------- Delivery zones ----------
+  $("#deliveryZones").innerHTML = DELIVERY.map((z) => `
+    <div class="zone">
+      <div class="zone__top"><strong>${z.zone}</strong><span class="zone__fee">${money(z.fee)}</span></div>
+      <span class="zone__eta">⏱ ${z.eta}</span>
+      <span class="zone__towns">${z.towns}</span>
+    </div>`).join("");
+  $("#zoneSelect").innerHTML += DELIVERY.map((z) =>
+    `<option value="${z.id}">${z.zone} — ${money(z.fee)}</option>`).join("");
 
   // ---------- Mobile menu ----------
   $("#menuBtn").addEventListener("click", () => $("#nav").classList.toggle("open"));
@@ -52,7 +63,9 @@
         <div class="product__body">
           <span class="product__cat">${CATEGORY[p.category].label}</span>
           <h3 class="product__name">${p.name}</h3>
-          <span class="product__sizes">Sizes: ${p.sizes}</span>
+          ${p.sizes.length > 1
+            ? `<select class="size" id="size-${p.id}" aria-label="Choose size">${p.sizes.map((s) => `<option>${s}</option>`).join("")}</select>`
+            : `<span class="product__sizes">${p.sizes[0]}</span>`}
           <div class="product__row">
             <span class="price">${money(p.price)}${p.oldPrice ? `<s>${money(p.oldPrice)}</s>` : ""}</span>
             <button class="add" data-id="${p.id}">Add to bag</button>
@@ -72,12 +85,15 @@
   }));
 
   // ---------- Cart ----------
+  // Each line is { id, size, qty }; the same product in two sizes is two lines.
   let cart = [];
   try { cart = JSON.parse(localStorage.getItem("cart") || "[]"); } catch (e) { cart = []; }
-  cart = cart.filter((i) => PRODUCTS.some((p) => p.id === i.id));
+  cart = cart.filter((i) => i.size && PRODUCTS.some((p) => p.id === i.id));
 
   const save = () => { try { localStorage.setItem("cart", JSON.stringify(cart)); } catch (e) {} };
   const find = (id) => PRODUCTS.find((p) => p.id === id);
+  const zone = () => DELIVERY.find((z) => z.id === $("#zoneSelect").value);
+  const subtotal = () => cart.reduce((s, i) => s + find(i.id).price * i.qty, 0);
 
   function toast(msg) {
     const t = $("#toast");
@@ -89,27 +105,29 @@
 
   function renderCart() {
     const count = cart.reduce((s, i) => s + i.qty, 0);
-    const total = cart.reduce((s, i) => s + find(i.id).price * i.qty, 0);
+    const z = zone();
     $("#cartCount").textContent = count;
-    $("#cartTotal").textContent = money(total);
+    $("#cartSubtotal").textContent = money(subtotal());
+    $("#cartDelivery").textContent = z ? money(z.fee) : "Choose area";
+    $("#cartTotal").textContent = money(subtotal() + (z && cart.length ? z.fee : 0));
     $("#checkout").disabled = !cart.length;
     $("#checkout").style.opacity = cart.length ? 1 : .5;
 
-    $("#cartItems").innerHTML = cart.length ? cart.map((i) => {
+    $("#cartItems").innerHTML = cart.length ? cart.map((i, n) => {
       const p = find(i.id);
       return `
         <div class="cart-item">
           <div class="cart-item__img" style="background:${CATEGORY[p.category].bg}">${thumb(p)}</div>
           <div>
             <h4>${p.name}</h4>
-            <small>${money(p.price)} · ${p.sizes}</small>
+            <small>${money(p.price)} · ${i.size}</small>
             <div class="qty">
-              <button data-dec="${p.id}" aria-label="Decrease">−</button>
+              <button data-dec="${n}" aria-label="Decrease">−</button>
               <span>${i.qty}</span>
-              <button data-inc="${p.id}" aria-label="Increase">+</button>
+              <button data-inc="${n}" aria-label="Increase">+</button>
             </div>
           </div>
-          <button class="remove" data-rm="${p.id}">Remove</button>
+          <button class="remove" data-rm="${n}">Remove</button>
         </div>`;
     }).join("") : `<p class="cart__empty">Your bag is empty 🧸<br>Add something cute!</p>`;
     save();
@@ -119,20 +137,21 @@
     const t = e.target.closest("button");
     if (!t) return;
     if (t.dataset.id) {
-      const id = +t.dataset.id;
-      const item = cart.find((i) => i.id === id);
-      item ? item.qty++ : cart.push({ id, qty: 1 });
+      const p = find(+t.dataset.id);
+      const sel = document.getElementById(`size-${p.id}`);
+      const size = sel ? sel.value : p.sizes[0];
+      const item = cart.find((i) => i.id === p.id && i.size === size);
+      item ? item.qty++ : cart.push({ id: p.id, size, qty: 1 });
       renderCart();
-      toast("Added to your bag ✓");
+      toast(`Added to your bag ✓`);
     } else if (t.dataset.inc) {
-      cart.find((i) => i.id === +t.dataset.inc).qty++;
+      cart[+t.dataset.inc].qty++;
       renderCart();
     } else if (t.dataset.dec) {
-      const item = cart.find((i) => i.id === +t.dataset.dec);
-      if (--item.qty <= 0) cart = cart.filter((i) => i !== item);
+      if (--cart[+t.dataset.dec].qty <= 0) cart.splice(+t.dataset.dec, 1);
       renderCart();
     } else if (t.dataset.rm) {
-      cart = cart.filter((i) => i.id !== +t.dataset.rm);
+      cart.splice(+t.dataset.rm, 1);
       renderCart();
     }
   });
@@ -142,15 +161,33 @@
   $("#openCart").addEventListener("click", openCart);
   $("#closeCart").addEventListener("click", closeCart);
   $("#overlay").addEventListener("click", closeCart);
+  $("#zoneSelect").addEventListener("change", renderCart);
+  $("#orderForm").addEventListener("input", (e) => e.target.classList.remove("invalid"));
 
   $("#checkout").addEventListener("click", () => {
     if (!cart.length) return;
+    const form = $("#orderForm");
+    const missing = ["name", "zone", "area"].map((n) => form.elements[n]).filter((el) => !el.value.trim());
+    missing.forEach((el) => el.classList.add("invalid"));
+    if (missing.length) { toast("Please fill in your name & delivery details"); missing[0].focus(); return; }
+
+    const z = zone();
     const lines = cart.map((i) => {
       const p = find(i.id);
-      return `• ${p.name} x${i.qty} — ${money(p.price * i.qty)}`;
+      return `• ${p.name} (${i.size}) x${i.qty} — ${money(p.price * i.qty)}`;
     });
-    const total = cart.reduce((s, i) => s + find(i.id).price * i.qty, 0);
-    const msg = `Hello ${SHOP.name}! I'd like to order:\n\n${lines.join("\n")}\n\nTotal: ${money(total)}\n\nSize(s): \nDelivery location: \nName: `;
+    const msg = [
+      `Hello ${SHOP.name}! 👋 I'd like to place an order:`,
+      "",
+      ...lines,
+      "",
+      `Subtotal: ${money(subtotal())}`,
+      `Delivery (${z.zone}): ${money(z.fee)}`,
+      `*Total: ${money(subtotal() + z.fee)}*`,
+      "",
+      `Name: ${form.elements.name.value.trim()}`,
+      `Location: ${form.elements.area.value.trim()}`,
+    ].join("\n");
     window.open(waLink(msg), "_blank");
   });
 

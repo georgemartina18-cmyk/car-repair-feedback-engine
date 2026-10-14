@@ -1,4 +1,4 @@
-# Kids Store Website: Beginner's Guide
+# ABICEE KIDS Website: Beginner's Guide
 
 This folder holds a complete, mobile-friendly online shop for a kids' clothing business in Ghana.
 Customers browse products, add them to a bag, and send the whole order to the shop's **WhatsApp** in one tap.
@@ -41,17 +41,18 @@ kids-store/
 You only need a text editor. **VS Code** is free (https://code.visualstudio.com), or use Notepad.
 
 1. **`js/config.js`**: change the name, WhatsApp number, phone, email, location and links.
+   - The **delivery zones and fees** are in the same file (`DELIVERY`). The current fees are starting estimates with Accra as the base, so confirm them with the client.
    - WhatsApp number format: drop the first `0` and add `233` in front, with no spaces and no `+`.
      For example, `024 412 3456` becomes `233244123456`.
 2. **`js/products.js`**: one line per product. Copy a line to add a product and delete a line to remove one.
-   - Put the photo file in `images/products/` and write its name, for example `image: "images/products/pink-dress.jpg"`.
+   - `sizes` is the list customers choose from, e.g. `["2–3 yrs", "4–5 yrs"]`, or `["One size"]`.
+   - The current pictures are temporary illustrations (`.svg` files). To use real photos, put the photo file in `images/products/` and write its name, for example `image: "images/products/pink-dress.jpg"`.
    - Keep photo file names lowercase with no spaces.
    - Shrink large photos first at https://squoosh.app (aim for under 200 KB each) so the site loads fast on mobile data.
 3. **`index.html`**: replace the placeholder text:
    - the **"500+ happy parents / 16 regions / 4.9★"** numbers (use real numbers or delete them),
    - the **three reviews** under "What parents say" (use real customer words),
    - the **About us** paragraph (her real story),
-   - the **delivery times**,
    - the shop name in the `<title>` and `description` tags at the top.
    > ⚠️ Don't publish fake reviews or stats. Replace them with real ones before going live.
 4. **Colours**: the top of `css/style.css` has `--primary` (pink) and `--accent` (yellow). Change them to match her brand.

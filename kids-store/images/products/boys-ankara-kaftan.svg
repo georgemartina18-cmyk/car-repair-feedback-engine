@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+<rect width="400" height="400" fill="#fff1e0"/>
+<circle cx="320" cy="70" r="90" fill="#ff9f5a" opacity=".35"/>
+<circle cx="60" cy="350" r="70" fill="#ff9f5a" opacity=".25"/>
+<ellipse cx="200" cy="352" rx="120" ry="14" fill="#2b2140" opacity=".08"/>
+
+<defs><pattern id="ak" width="40" height="40" patternUnits="userSpaceOnUse"><rect width="40" height="40" fill="#e8702a"/><path d="M0 20 L20 0 L40 20 L20 40z" fill="#ffc94d"/><circle cx="20" cy="20" r="6" fill="#1f7a5a"/><circle cx="0" cy="0" r="5" fill="#2b2140"/><circle cx="40" cy="40" r="5" fill="#2b2140"/><circle cx="40" cy="0" r="5" fill="#2b2140"/><circle cx="0" cy="40" r="5" fill="#2b2140"/></pattern></defs>
+<path d="M150 55 q50 25 100 0 l70 40 -20 70 -40 -15 v190 h-140 v-190 l-40 15 -20 -70z" fill="url(#ak)"/>
+<path d="M150 55 q50 25 100 0 l-10 18 q-40 22 -80 0z" fill="#1f7a5a"/>
+<path d="M200 70 v80" stroke="#1f7a5a" stroke-width="8"/>
+<path d="M160 340 h80" stroke="#1f7a5a" stroke-width="10"/>
+</svg>
