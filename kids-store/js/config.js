@@ -7,9 +7,9 @@ const SHOP = {
 
   // WhatsApp number in international format, digits only (no +, no spaces).
   // Example: 0244123456 in Ghana becomes 233244123456
-  whatsapp: "233000000000",
+  whatsapp: "2348105149828",
 
-  phoneDisplay: "+233 00 000 0000",
+  phoneDisplay: "+234 810 514 9828",
   email: "",                       // leave "" to hide
   location: "Accra, Ghana",
   hours: "Mon – Sat: 8:00am – 7:00pm",
