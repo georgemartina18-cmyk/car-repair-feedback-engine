@@ -196,7 +196,30 @@ body.cart-open .cart { transform: none; }
 .qty { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
 .qty button { width: 26px; height: 26px; border-radius: 50%; background: var(--tint); font-weight: 800; }
 .remove { color: var(--muted); font-size: .8rem; text-decoration: underline; }
-.cart__foot { padding: 20px; border-top: 1px solid var(--line); }
+.cart__foot { padding: 16px 20px 20px; border-top: 1px solid var(--line); max-height: 72vh; overflow-y: auto; display: grid; gap: 4px; }
+.cart__foot .btn { margin-top: 6px; padding: 12px 20px; }
+.cart__items { min-height: 90px; }
+.pay { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.pay label { cursor: pointer; }
+.pay input { position: absolute; opacity: 0; }
+.pay span { display: flex; flex-direction: column; justify-content: center; height: 100%; padding: 9px 10px; border: 2px solid var(--line); border-radius: 10px; font-size: .88rem; font-weight: 700; }
+.pay small { font-weight: 600; color: var(--muted); font-size: .72rem; }
+.pay input:checked + span { border-color: var(--primary); background: #fff3f6; }
+.pay input:focus-visible + span { outline: 2px solid var(--primary); }
+.cart__form textarea { font: inherit; font-size: .9rem; padding: 10px 12px; border: 2px solid var(--line); border-radius: 10px; resize: vertical; }
+.cart__form textarea:focus { outline: none; border-color: var(--primary); }
+.hp { position: absolute; left: -9999px; width: 1px; height: 1px; }
+.cart__done { display: none; padding: 28px 22px; overflow-y: auto; text-align: center; }
+.cart.is-done .cart__items, .cart.is-done .cart__foot { display: none; }
+.cart.is-done .cart__done { display: grid; gap: 12px; align-content: start; }
+.done__icon { font-size: 3.4rem; }
+.cart__done h3 { font-size: 1.7rem; }
+.cart__done p { color: var(--muted); }
+.done__box { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.done__box div { background: var(--tint); border-radius: 14px; padding: 12px; display: grid; }
+.done__box span { font-size: .8rem; color: var(--muted); }
+.done__momo { background: #fff8e1; border: 2px dashed var(--accent); border-radius: 14px; padding: 14px; display: grid; gap: 4px; text-align: left; }
+.done__momo small { color: var(--muted); }
 .cart__form { display: grid; gap: 8px; margin-bottom: 14px; }
 .cart__form input, .cart__form select { font: inherit; font-size: .9rem; padding: 10px 12px; border: 2px solid var(--line); border-radius: 10px; background: #fff; width: 100%; }
 .cart__form input:focus, .cart__form select:focus { outline: none; border-color: var(--primary); }

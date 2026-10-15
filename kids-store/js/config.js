@@ -25,17 +25,25 @@ const SHOP = {
   // Google Sheet product list (published as CSV). Leave "" to use js/products.js.
   // How to get this link: see README.md, "Let the owner add products".
   productsSheet: "",
+
+  // Website orders: the Google Apps Script web app link (see SETUP-GOOGLE-SHEET.md, Part 8).
+  // Leave "" and customers can only order on WhatsApp.
+  ordersEndpoint: "",
+
+  // Shown to customers who choose Mobile Money. Leave number "" to hide.
+  momo: { number: "", name: "" },
 };
 
 /* =========================================================
    DELIVERY ZONES (base: Accra). Fees are in GH₵.
    Customers pick their zone in the bag and the fee is added
    to the order total automatically. Edit freely.
+   cod: true = "Pay on delivery" is allowed in that zone.
    ========================================================= */
 const DELIVERY = [
-  { id: "accra",   zone: "Accra (central)",            eta: "Same / next day", fee: 30,
+  { id: "accra",   zone: "Accra (central)",            eta: "Same / next day", fee: 30, cod: true,
     towns: "Osu, Labone, Airport, East Legon, Madina, Achimota, Lapaz, Dansoman, Spintex, Haatso, Dzorwulu" },
-  { id: "greater", zone: "Greater Accra (outskirts)",  eta: "Next day",        fee: 40,
+  { id: "greater", zone: "Greater Accra (outskirts)",  eta: "Next day",        fee: 40, cod: true,
     towns: "Tema, Ashaiman, Kasoa, Adenta, Oyarifa, Dodowa, Amasaman, Pokuase, Weija, Kpone, Prampram" },
   { id: "near",    zone: "Eastern & Central",          eta: "1 – 2 days",      fee: 50,
     towns: "Aburi, Nsawam, Koforidua, Nkawkaw, Akosombo, Winneba, Cape Coast, Mankessim, Swedru" },

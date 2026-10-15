@@ -88,12 +88,54 @@ can't show private photos.
 5. Open the website. Your test product should show (within about 5 minutes).
 
    Or just send the link to Claude and it will update the files for you.
+   (Parts 1–7 = products. Part 8 = website orders.)
 
 ## Part 7: Hand over to the owner
 
 1. Delete the test row in the Sheet, or type `Hide` in its Status cell.
 2. Send her the **form link**: in the form, click **Send**, then the 🔗 link tab, then **Copy**.
 3. Give her `OWNER-GUIDE.md` (or read it to her), along with the shop code if you set one.
+
+---
+
+## Part 8: Turn on ordering on the website (10 min)
+
+Customers can then tap **Place order** on the website. Each order is saved in an **Orders**
+tab in this same Sheet, and the owner gets an **email** for every order. The **Order on
+WhatsApp** button stays available too.
+
+1. Open the products Google Sheet (from Part 2).
+2. Click **Extensions → Apps Script**. A code editor opens in a new tab.
+3. Delete everything in the editor, then **copy all of** `setup/orders-script.gs` and paste it in.
+4. Click the 💾 **Save** icon, and name the project **ABICEE orders** if asked.
+5. Click the blue **Deploy** button, then **New deployment**.
+   - Click the ⚙️ next to "Select type" and choose **Web app**.
+   - Description: `Website orders`
+   - Execute as: **Me**
+   - Who has access: **Anyone**. This lets customers' browsers send orders in. They
+     can't read the Sheet.
+   - Click **Deploy**.
+6. Google asks for permission. Click **Authorize access** and choose the shop's Gmail.
+   - If you see *"Google hasn't verified this app"*, click **Advanced**, then
+     **Go to ABICEE orders (unsafe)**. This is normal for your own script.
+   - Click **Allow**. The script needs this to add rows to the Sheet and send the order emails.
+7. Copy the **Web app URL**. It looks like `https://script.google.com/macros/s/AKfy.../exec`.
+   - To check it works, open that link in your browser. It should say
+     *"ABICEE KIDS order system is running"*.
+8. In `js/config.js`:
+   ```js
+   ordersEndpoint: "https://script.google.com/macros/s/AKfy.../exec",
+   momo: { number: "024 123 4567", name: "Abigail ..." },   // her MoMo number & registered name
+   ```
+   Then re-upload the folder to Netlify (Deploys tab, drag and drop).
+9. Test it: place an order on the website. Within seconds you should get an email, and a new
+   row in the **Orders** tab.
+
+**Important:** always call or WhatsApp the customer to confirm an order before sending it.
+Check that the total matches the website prices and that payment has arrived in MoMo.
+
+**If you change the script later:** go to **Deploy → Manage deployments → ✏️ Edit**, set
+**Version: New version**, then **Deploy**. The URL stays the same.
 
 ---
 

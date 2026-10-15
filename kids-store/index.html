@@ -90,7 +90,7 @@
     <div class="container">
       <div class="section__head">
         <h2>Our collection</h2>
-        <p>Tap <strong>Add to bag</strong>, then send your order to us on WhatsApp in one click.</p>
+        <p>Tap <strong>Add to bag</strong>, then place your order right here — or send it on WhatsApp.</p>
       </div>
       <div class="filters" id="filters">
         <button class="chip is-active" data-filter="all">All</button>
@@ -137,7 +137,7 @@
       </div>
       <ol class="steps">
         <li><span>1</span><h3>Pick your items</h3><p>Add products to your bag and choose sizes.</p></li>
-        <li><span>2</span><h3>Send on WhatsApp</h3><p>Your order is sent to us automatically — we confirm availability.</p></li>
+        <li><span>2</span><h3>Place your order</h3><p>Place your order on the website or send it on WhatsApp — we confirm availability.</p></li>
         <li><span>3</span><h3>Pay with MoMo</h3><p>MTN MoMo, Telecel Cash, AT Money or cash on delivery (Accra).</p></li>
         <li><span>4</span><h3>Receive &amp; enjoy</h3><p>Doorstep in Accra; nearest station or courier point elsewhere.</p></li>
       </ol>
@@ -211,16 +211,24 @@
     <div class="cart__items" id="cartItems"></div>
     <div class="cart__foot">
       <form class="cart__form" id="orderForm" novalidate>
-        <input name="name" placeholder="Your name" autocomplete="name" />
-        <select name="zone" id="zoneSelect"><option value="">Choose delivery area…</option></select>
-        <input name="area" placeholder="Town / area &amp; landmark (e.g. Madina, near Zongo junction)" />
+        <input name="name" placeholder="Your name *" autocomplete="name" />
+        <input name="phone" type="tel" placeholder="Phone / WhatsApp number *" autocomplete="tel" />
+        <select name="zone" id="zoneSelect"><option value="">Choose delivery area… *</option></select>
+        <input name="area" placeholder="Town / area &amp; landmark * (e.g. Madina, near Zongo junction)" />
+        <div class="pay" role="radiogroup" aria-label="Payment method">
+          <label><input type="radio" name="payment" value="Mobile Money" checked /><span>📱 Mobile Money</span></label>
+          <label><input type="radio" name="payment" value="Pay on delivery" /><span>💵 Pay on delivery<small>Greater Accra</small></span></label>
+        </div>
+        <textarea name="note" rows="2" placeholder="Note for us (optional)"></textarea>
+        <input name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
       </form>
       <div class="cart__line"><span>Subtotal</span><span id="cartSubtotal">GH₵ 0</span></div>
       <div class="cart__line"><span>Delivery</span><span id="cartDelivery">—</span></div>
       <div class="cart__total"><span>Total</span><strong id="cartTotal">GH₵ 0</strong></div>
-      <p class="cart__note">Pay with MoMo after we confirm your order on WhatsApp.</p>
-      <button class="btn btn--wa btn--block" id="checkout">💬 Send order on WhatsApp</button>
+      <button class="btn btn--primary btn--block" id="placeOrder">✅ Place order</button>
+      <button class="btn btn--wa btn--block" id="checkout">💬 Order on WhatsApp instead</button>
     </div>
+    <div class="cart__done" id="orderDone"></div>
   </aside>
 
   <div class="toast" id="toast"></div>

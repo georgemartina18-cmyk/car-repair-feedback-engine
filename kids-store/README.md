@@ -1,7 +1,7 @@
 # ABICEE KIDS Website: Beginner's Guide
 
 This folder holds a complete, mobile-friendly online shop for a kids' clothing business in Ghana.
-Customers browse products, add them to a bag, and send the whole order to the shop's **WhatsApp** in one tap.
+Customers browse products, add them to a bag, and either **place the order on the website** or send it to the shop's **WhatsApp** in one tap.
 They pay with **Mobile Money**. You don't need a database, a server or any monthly fees to run it.
 
 ```
@@ -13,6 +13,11 @@ kids-store/
 ├── js/app.js           ← site logic (no need to touch)
 └── images/products/    ← 📷 put product photos here
 ```
+
+> **Guides in this folder**
+> - `SETUP-GOOGLE-SHEET.md`: connect the Google Sheet so the owner can add products from her
+>   phone (Parts 1–7) and turn on ordering on the website (Part 8).
+> - `OWNER-GUIDE.md`: a simple guide to give the owner.
 
 ---
 

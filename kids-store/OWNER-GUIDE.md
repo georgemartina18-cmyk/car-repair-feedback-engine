@@ -39,4 +39,17 @@ In the Google Sheets app, find the product's row and scroll right to the **Statu
 1. Open the form link in **Chrome**.
 2. Tap **⋮** (top right), then **Add to Home screen**, then **Add**.
 
-Orders still come to you on **WhatsApp** as before. 💬
+## 🛍️ When a customer orders
+Customers can order in **two ways**:
+
+1. **On the website.** You get an **email** titled *"🛍️ New order AK-XXXX"*, and the order
+   appears in the **Orders** tab of your Google Sheet.
+2. **On WhatsApp.** The order arrives as a WhatsApp message, the same as before.
+
+**For every order:**
+1. **Call or WhatsApp the customer** on the number they gave to confirm the item, size and
+   delivery location.
+2. For **Mobile Money**, wait until the payment shows in your MoMo **before sending** the parcel.
+   Customers use the order number (e.g. *AK-7F3K2*) as the payment reference.
+3. In the **Orders** tab, change **Status** from `New` to `Confirmed`, then `Paid`, then
+   `Sent`, so you always know where each order is.

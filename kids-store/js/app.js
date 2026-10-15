@@ -116,8 +116,10 @@
     $("#cartSubtotal").textContent = money(subtotal());
     $("#cartDelivery").textContent = z ? money(z.fee) : "Choose area";
     $("#cartTotal").textContent = money(subtotal() + (z && cart.length ? z.fee : 0));
-    $("#checkout").disabled = !cart.length;
-    $("#checkout").style.opacity = cart.length ? 1 : .5;
+    ["#checkout", "#placeOrder"].forEach((sel) => {
+      const b = $(sel);
+      if (b) { b.disabled = !cart.length; b.style.opacity = cart.length ? 1 : .5; }
+    });
 
     $("#cartItems").innerHTML = cart.length ? cart.map((i, n) => {
       const p = find(i.id);
@@ -163,38 +165,132 @@
   });
 
   const openCart = () => document.body.classList.add("cart-open");
-  const closeCart = () => document.body.classList.remove("cart-open");
+  const closeCart = () => {
+    document.body.classList.remove("cart-open");
+    $("#cart").classList.remove("is-done");
+  };
   $("#openCart").addEventListener("click", openCart);
   $("#closeCart").addEventListener("click", closeCart);
   $("#overlay").addEventListener("click", closeCart);
   $("#zoneSelect").addEventListener("change", renderCart);
   $("#orderForm").addEventListener("input", (e) => e.target.classList.remove("invalid"));
 
-  $("#checkout").addEventListener("click", () => {
-    if (!cart.length) return;
-    const form = $("#orderForm");
-    const missing = ["name", "zone", "area"].map((n) => form.elements[n]).filter((el) => !el.value.trim());
-    missing.forEach((el) => el.classList.add("invalid"));
-    if (missing.length) { toast("Please fill in your name & delivery details"); missing[0].focus(); return; }
+  // ---------- Checkout (on the website or via WhatsApp) ----------
+  const form = $("#orderForm");
+  const onlineOrders = Boolean(SHOP.ordersEndpoint);
+  if (!onlineOrders) {
+    // No order system connected yet: WhatsApp is the only way to order.
+    $("#placeOrder").remove();
+    form.elements.phone.remove();
+    $("#checkout").textContent = "💬 Send order on WhatsApp";
+  }
 
+  const val = (n) => (form.elements[n] ? form.elements[n].value.trim() : "");
+
+  function validate(fields) {
+    const bad = fields.map((n) => form.elements[n]).filter((el) => el && !el.value.trim());
+    if (form.elements.phone && fields.includes("phone") && val("phone").replace(/\D/g, "").length < 9) {
+      if (!bad.includes(form.elements.phone)) bad.push(form.elements.phone);
+    }
+    bad.forEach((el) => el.classList.add("invalid"));
+    if (bad.length) { toast("Please fill in the highlighted details"); bad[0].focus(); return false; }
     const z = zone();
-    const lines = cart.map((i) => {
-      const p = find(i.id);
-      return `• ${p.name} (${i.size}) x${i.qty} — ${money(p.price * i.qty)}`;
-    });
+    if (val("payment") === "Pay on delivery" && !z.cod) {
+      toast("Pay on delivery is only available in Greater Accra");
+      return false;
+    }
+    return true;
+  }
+
+  function orderSummary() {
+    const z = zone();
+    return {
+      items: cart.map((i) => {
+        const p = find(i.id);
+        return { name: p.name, size: i.size, qty: i.qty, price: p.price, lineTotal: p.price * i.qty };
+      }),
+      zone: z.zone,
+      subtotal: subtotal(),
+      delivery: z.fee,
+      total: subtotal() + z.fee,
+    };
+  }
+
+  $("#checkout").addEventListener("click", () => {
+    if (!cart.length || !validate(["name", "zone", "area"])) return;
+    const o = orderSummary();
     const msg = [
       `Hello ${SHOP.name}! 👋 I'd like to place an order:`,
       "",
-      ...lines,
+      ...o.items.map((i) => `• ${i.name} (${i.size}) x${i.qty} — ${money(i.lineTotal)}`),
       "",
-      `Subtotal: ${money(subtotal())}`,
-      `Delivery (${z.zone}): ${money(z.fee)}`,
-      `*Total: ${money(subtotal() + z.fee)}*`,
+      `Subtotal: ${money(o.subtotal)}`,
+      `Delivery (${o.zone}): ${money(o.delivery)}`,
+      `*Total: ${money(o.total)}*`,
       "",
-      `Name: ${form.elements.name.value.trim()}`,
-      `Location: ${form.elements.area.value.trim()}`,
+      `Name: ${val("name")}`,
+      `Location: ${val("area")}`,
+      `Payment: ${val("payment")}`,
+      ...(val("note") ? [`Note: ${val("note")}`] : []),
     ].join("\n");
     window.open(waLink(msg), "_blank");
+  });
+
+  const newOrderId = () => "AK-" + Date.now().toString(36).slice(-4).toUpperCase()
+    + Math.random().toString(36).slice(2, 4).toUpperCase();
+
+  $("#placeOrder") && $("#placeOrder").addEventListener("click", async () => {
+    if (!cart.length || !validate(["name", "phone", "zone", "area"])) return;
+    const btn = $("#placeOrder");
+    const o = { ...orderSummary(), orderId: newOrderId(), name: val("name"), phone: val("phone"),
+      area: val("area"), payment: val("payment"), note: val("note"), website: val("website") };
+
+    btn.disabled = true;
+    btn.textContent = "Sending your order…";
+    try {
+      // Sent as plain text so the browser makes a simple request Google accepts.
+      const res = await fetch(SHOP.ordersEndpoint, { method: "POST", body: JSON.stringify(o) });
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error || "Order not saved");
+      showDone(o);
+      cart = [];
+      renderCart();
+    } catch (e) {
+      console.warn("Order failed:", e);
+      toast("Sorry, we couldn't send your order. Please use the WhatsApp button.");
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "✅ Place order";
+    }
+  });
+
+  function showDone(o) {
+    const momo = SHOP.momo && SHOP.momo.number;
+    $("#orderDone").innerHTML = `
+      <div class="done__icon">🎉</div>
+      <h3>Thank you, ${esc(o.name.split(" ")[0])}!</h3>
+      <p>Your order <strong>${esc(o.orderId)}</strong> has been received.</p>
+      <div class="done__box">
+        <div><span>Total</span><strong>${money(o.total)}</strong></div>
+        <div><span>Payment</span><strong>${esc(o.payment)}</strong></div>
+      </div>
+      <p>We'll call or WhatsApp you on <strong>${esc(o.phone)}</strong> shortly to confirm your order${o.payment === "Mobile Money" ? " and payment" : ""}.</p>
+      ${o.payment === "Mobile Money" && momo ? `
+        <div class="done__momo">
+          <strong>📱 Pay with Mobile Money</strong>
+          <span>Number: <b>${esc(SHOP.momo.number)}</b></span>
+          <span>Name: <b>${esc(SHOP.momo.name)}</b></span>
+          <span>Reference: <b>${esc(o.orderId)}</b></span>
+          <small>Please wait for our confirmation call before paying.</small>
+        </div>` : ""}
+      <a class="btn btn--wa btn--block" target="_blank" rel="noopener"
+         href="${waLink(`Hello ${SHOP.name}, I just placed order ${o.orderId} on your website.`)}">💬 Chat with us about this order</a>
+      <button class="btn btn--ghost btn--block" id="doneClose">Continue shopping</button>`;
+    $("#cart").classList.add("is-done");
+  }
+
+  document.addEventListener("click", (e) => {
+    if (e.target.id === "doneClose") { $("#cart").classList.remove("is-done"); closeCart(); }
   });
 
   // ---------- Contact form -> WhatsApp ----------
