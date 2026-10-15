@@ -23,7 +23,7 @@ const SHOP = {
   currency: "GH₵",
 
   // Google Sheet product list (published as CSV). Leave "" to use js/products.js.
-  // How to get this link: see README.md, "Let the owner add products".
+  // How to get this link: see SETUP-GOOGLE-SHEET.md, Parts 1–6.
   productsSheet: "",
 
   // Website orders: the Google Apps Script web app link (see SETUP-GOOGLE-SHEET.md, Part 8).
