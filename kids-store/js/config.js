@@ -28,7 +28,7 @@ const SHOP = {
 
   // Website orders: the Google Apps Script web app link (see SETUP-GOOGLE-SHEET.md, Part 8).
   // Leave "" and customers can only order on WhatsApp.
-  ordersEndpoint: "",
+  ordersEndpoint: "https://script.google.com/macros/s/AKfycbzDTkDtO5dP-JlrAZUgQ83tQKh1K8XyZVpI0_xuFktHx-nuM2JxvCkTakwUzXPF_Z8srA/exec",
 
   // Shown to customers who choose Mobile Money. Leave number "" to hide.
   momo: { number: "", name: "" },

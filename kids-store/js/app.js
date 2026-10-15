@@ -141,7 +141,7 @@
           </div>
           <button class="remove" data-rm="${n}">Remove</button>
         </div>`;
-    }).join("") : `<p class="cart__empty">Your bag is empty 🧸<br>Add something cute!</p>`;
+    }).join("") : `<p class="cart__empty">Your bag is empty 🎈<br>Add something cute!</p>`;
     save();
   }
 

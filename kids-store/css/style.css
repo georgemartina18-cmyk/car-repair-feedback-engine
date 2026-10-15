@@ -130,6 +130,7 @@ h1, h2, h3 { font-family: "Baloo 2", cursive; line-height: 1.15; }
 .about { display: grid; grid-template-columns: 1fr 1.2fr; gap: 48px; align-items: center; }
 .about__img { aspect-ratio: 4 / 3; border-radius: 32px; background: linear-gradient(135deg, var(--accent), var(--primary)); display: grid; place-items: center; font-size: 8rem; overflow: hidden; }
 .about__img img { width: 100%; height: 100%; object-fit: cover; }
+.about__img .about__logo { width: 45%; height: auto; filter: drop-shadow(0 12px 24px rgba(43,33,64,.25)); }
 .about h2 { font-size: 2.4rem; margin-bottom: 14px; }
 .about p { color: var(--muted); margin-bottom: 14px; }
 
