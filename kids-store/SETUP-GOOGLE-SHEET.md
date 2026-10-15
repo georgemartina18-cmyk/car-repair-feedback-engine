@@ -47,9 +47,13 @@ will hand over to her, so that she owns her product list.
 
 ## Part 3: Add one test product (2 min)
 
-1. Go back to the form, click the **eye icon 👁 (Preview)** at the top, and fill it in with
-   any product and photo, then click **Submit**.
-2. Check the Sheet: a new row should appear.
+1. In the form, click the purple **Publish** button (top right) and confirm. Forms only
+   accept submissions once they are published.
+2. Click **Copy responder link** (or the 🔗 icon), open a new tab and paste the link.
+   (Preview mode 👁 can't submit, so use the real link.)
+3. Fill it in with any product and photo, then click **Submit**.
+4. Check the Sheet: a new row should appear.
+5. Keep the responder link safe. It's the link the owner will use to add products.
 
 ## Part 4: Make the photos viewable (2 min)
 
