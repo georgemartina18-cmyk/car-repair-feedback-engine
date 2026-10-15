@@ -10,6 +10,8 @@
   const money = (n) => `${SHOP.currency} ${n.toLocaleString("en-GH")}`;
   const $ = (s) => document.querySelector(s);
   const $$ = (s) => document.querySelectorAll(s);
+  const esc = (v) => String(v).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  let products = [];
 
   // ---------- Shop details ----------
   $$("[data-shop]").forEach((el) => { el.textContent = SHOP[el.dataset.shop] || el.textContent; });
@@ -49,26 +51,31 @@
 
   // ---------- Products ----------
   const thumb = (p) => p.image
-    ? `<img src="${p.image}" alt="${p.name}" loading="lazy">`
+    ? `<img src="${esc(p.image)}" alt="${esc(p.name)}" loading="lazy" onerror="this.replaceWith('${CATEGORY[p.category].icon}')">`
     : CATEGORY[p.category].icon;
 
   function render(filter) {
-    const list = filter === "all" ? PRODUCTS : PRODUCTS.filter((p) => p.category === filter);
-    $("#productGrid").innerHTML = list.map((p) => `
+    const list = filter === "all" ? products : products.filter((p) => p.category === filter);
+    $("#productGrid").innerHTML = !list.length
+      ? `<p class="grid__empty">New items in this category are coming soon — message us on WhatsApp to ask!</p>`
+      : list.map((p) => `
       <article class="product">
         <div class="product__img" style="background:${CATEGORY[p.category].bg}">
           ${thumb(p)}
-          ${p.badge ? `<span class="badge badge--${p.badge}">${p.badge}</span>` : ""}
+          ${p.soldOut ? `<span class="badge badge--Sold">Sold out</span>`
+            : p.badge ? `<span class="badge badge--${p.badge}">${p.badge}</span>` : ""}
         </div>
         <div class="product__body">
           <span class="product__cat">${CATEGORY[p.category].label}</span>
-          <h3 class="product__name">${p.name}</h3>
+          <h3 class="product__name">${esc(p.name)}</h3>
           ${p.sizes.length > 1
-            ? `<select class="size" id="size-${p.id}" aria-label="Choose size">${p.sizes.map((s) => `<option>${s}</option>`).join("")}</select>`
-            : `<span class="product__sizes">${p.sizes[0]}</span>`}
+            ? `<select class="size" id="size-${p.id}" aria-label="Choose size">${p.sizes.map((s) => `<option>${esc(s)}</option>`).join("")}</select>`
+            : `<span class="product__sizes">${esc(p.sizes[0])}</span>`}
           <div class="product__row">
             <span class="price">${money(p.price)}${p.oldPrice ? `<s>${money(p.oldPrice)}</s>` : ""}</span>
-            <button class="add" data-id="${p.id}">Add to bag</button>
+            ${p.soldOut
+              ? `<button class="add" disabled>Sold out</button>`
+              : `<button class="add" data-id="${p.id}">Add to bag</button>`}
           </div>
         </div>
       </article>`).join("");
@@ -88,10 +95,9 @@
   // Each line is { id, size, qty }; the same product in two sizes is two lines.
   let cart = [];
   try { cart = JSON.parse(localStorage.getItem("cart") || "[]"); } catch (e) { cart = []; }
-  cart = cart.filter((i) => i.size && PRODUCTS.some((p) => p.id === i.id));
 
   const save = () => { try { localStorage.setItem("cart", JSON.stringify(cart)); } catch (e) {} };
-  const find = (id) => PRODUCTS.find((p) => p.id === id);
+  const find = (id) => products.find((p) => p.id === id);
   const zone = () => DELIVERY.find((z) => z.id === $("#zoneSelect").value);
   const subtotal = () => cart.reduce((s, i) => s + find(i.id).price * i.qty, 0);
 
@@ -119,8 +125,8 @@
         <div class="cart-item">
           <div class="cart-item__img" style="background:${CATEGORY[p.category].bg}">${thumb(p)}</div>
           <div>
-            <h4>${p.name}</h4>
-            <small>${money(p.price)} · ${i.size}</small>
+            <h4>${esc(p.name)}</h4>
+            <small>${money(p.price)} · ${esc(i.size)}</small>
             <div class="qty">
               <button data-dec="${n}" aria-label="Decrease">−</button>
               <span>${i.qty}</span>
@@ -137,7 +143,7 @@
     const t = e.target.closest("button");
     if (!t) return;
     if (t.dataset.id) {
-      const p = find(+t.dataset.id);
+      const p = find(t.dataset.id);
       const sel = document.getElementById(`size-${p.id}`);
       const size = sel ? sel.value : p.sizes[0];
       const item = cart.find((i) => i.id === p.id && i.size === size);
@@ -198,6 +204,12 @@
     window.open(waLink(`Hello, my name is ${f.get("name")}.\n\n${f.get("message")}`), "_blank");
   });
 
-  render("all");
-  renderCart();
+  $("#productGrid").innerHTML = `<p class="grid__empty">Loading our latest collection…</p>`;
+  ProductSource.load().then((list) => {
+    products = list;
+    cart = cart.filter((i) => i.size && find(String(i.id)) && !find(String(i.id)).soldOut)
+      .map((i) => ({ ...i, id: String(i.id) }));
+    render("all");
+    renderCart();
+  });
 })();

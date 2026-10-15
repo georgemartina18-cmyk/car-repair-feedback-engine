@@ -104,6 +104,9 @@ h1, h2, h3 { font-family: "Baloo 2", cursive; line-height: 1.15; }
 .badge--Sale { background: var(--primary); }
 .badge--Hot { background: #ff8a3d; }
 .badge--New { background: var(--mint); color: var(--ink); }
+.badge--Sold { background: #8a8299; }
+.add:disabled { background: #cfc9d8; cursor: not-allowed; }
+.grid__empty { grid-column: 1 / -1; text-align: center; color: var(--muted); padding: 40px 0; }
 .product__body { padding: 16px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
 .product__cat { font-size: .75rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 700; }
 .product__name { font-size: 1.12rem; }

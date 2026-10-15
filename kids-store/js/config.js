@@ -21,6 +21,10 @@ const SHOP = {
   },
 
   currency: "GH₵",
+
+  // Google Sheet product list (published as CSV). Leave "" to use js/products.js.
+  // How to get this link: see README.md, "Let the owner add products".
+  productsSheet: "",
 };
 
 /* =========================================================
