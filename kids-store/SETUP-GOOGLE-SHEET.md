@@ -145,7 +145,8 @@ Check that the total matches the website prices and that payment has arrived in 
 
 ### Good to know
 - **Changes take about 5 minutes to show.** Google refreshes published Sheets every few minutes.
-- **If the Sheet ever can't be reached,** the website automatically shows the products in
-  `js/products.js` instead of an empty shop.
+- **Once the Sheet is connected, only its products are shown.** The samples in
+  `js/products.js` are no longer used. If the Sheet is empty or can't be reached, customers
+  see a short note inviting them to message the shop on WhatsApp.
 - **You can add new form questions later.** It's fine if columns move around, because the
   website finds columns by their titles.

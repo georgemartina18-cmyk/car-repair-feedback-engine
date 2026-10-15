@@ -12,6 +12,7 @@
   const $$ = (s) => document.querySelectorAll(s);
   const esc = (v) => String(v).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   let products = [];
+  let loadError = false;
 
   // ---------- Shop details ----------
   $$("[data-shop]").forEach((el) => { el.textContent = SHOP[el.dataset.shop] || el.textContent; });
@@ -57,7 +58,10 @@
   function render(filter) {
     const list = filter === "all" ? products : products.filter((p) => p.category === filter);
     $("#productGrid").innerHTML = !list.length
-      ? `<p class="grid__empty">New items in this category are coming soon — message us on WhatsApp to ask!</p>`
+      ? `<p class="grid__empty">${loadError
+          ? "We couldn't load our products just now. Please refresh the page"
+          : products.length ? "New items in this category are coming soon" : "Our new collection is coming soon"}
+          — or <a href="${waLink("Hello! What do you have in stock?")}" target="_blank" rel="noopener">message us on WhatsApp</a> to see what's available.</p>`
       : list.map((p) => `
       <article class="product">
         <div class="product__img" style="background:${CATEGORY[p.category].bg}">
@@ -301,8 +305,9 @@
   });
 
   $("#productGrid").innerHTML = `<p class="grid__empty">Loading our latest collection…</p>`;
-  ProductSource.load().then((list) => {
+  ProductSource.load().then(({ products: list, error }) => {
     products = list;
+    if (error) loadError = true;
     cart = cart.filter((i) => i.size && find(String(i.id)) && !find(String(i.id)).soldOut)
       .map((i) => ({ ...i, id: String(i.id) }));
     render("all");

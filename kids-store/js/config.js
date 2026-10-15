@@ -24,7 +24,7 @@ const SHOP = {
 
   // Google Sheet product list (published as CSV). Leave "" to use js/products.js.
   // How to get this link: see SETUP-GOOGLE-SHEET.md, Parts 1–6.
-  productsSheet: "",
+  productsSheet: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTpV-xWiL9LODe34Md-dzNneZgNBZhG5KOU7DR3Y-z4edaHylozx_yPt1B3h_Zno53pHfyWRYSZZhJq/pub?gid=1282276322&single=true&output=csv",
 
   // Website orders: the Google Apps Script web app link (see SETUP-GOOGLE-SHEET.md, Part 8).
   // Leave "" and customers can only order on WhatsApp.

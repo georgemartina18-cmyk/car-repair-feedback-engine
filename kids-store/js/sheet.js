@@ -1,7 +1,7 @@
 /* =========================================================
    Loads products from the owner's Google Sheet (filled by the
    "Add product" Google Form). If no sheet is set in config.js,
-   or it can't be reached, the list in products.js is used.
+   the sample list in products.js is used instead.
 
    Columns are matched by their header text, so the order of
    columns in the sheet doesn't matter:
@@ -91,17 +91,17 @@ const ProductSource = (function () {
       .reverse(); // newest submissions first
   }
 
+  // Returns { products, error }. With a sheet connected, only the sheet's
+  // products are shown (never the samples in products.js).
   async function load() {
-    const fallback = PRODUCTS.map((p) => ({ ...p, id: String(p.id) }));
-    if (!SHOP.productsSheet) return fallback;
+    if (!SHOP.productsSheet) return { products: PRODUCTS.map((p) => ({ ...p, id: String(p.id) })) };
     try {
       const res = await fetch(SHOP.productsSheet, { cache: "no-store" });
       if (!res.ok) throw new Error("HTTP " + res.status);
-      const list = rowsToProducts(parseCSV(await res.text()));
-      return list.length ? list : fallback;
+      return { products: rowsToProducts(parseCSV(await res.text())) };
     } catch (e) {
-      console.warn("Could not load products from Google Sheet, using products.js instead:", e);
-      return fallback;
+      console.warn("Could not load products from Google Sheet:", e);
+      return { products: [], error: true };
     }
   }
 
