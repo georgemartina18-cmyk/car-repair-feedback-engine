@@ -18,6 +18,8 @@ kids-store/
 > - `SETUP-GOOGLE-SHEET.md`: connect the Google Sheet so the owner can add products from her
 >   phone (Parts 1–7) and turn on ordering on the website (Part 8).
 > - `OWNER-GUIDE.md`: a simple guide to give the owner.
+> - `LAUNCH-AND-HANDOVER.md`: launch day plan covering the business Gmail, Cloudflare Pages
+>   hosting, the domain, and the handover to the owner.
 
 ---
 
