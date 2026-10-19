@@ -26,11 +26,12 @@ will hand over to her, so that she owns her product list.
 | 4 | `Old price (optional, for sales)` | Short answer | not required |
 | 5 | `Sizes (separate with commas)` | Short answer | not required. In the description write: *e.g. 2-3 yrs, 4-5 yrs, 6-7 yrs. Leave empty for One size* |
 | 6 | `Badge` | Dropdown | Options: `None`, `New`, `Hot`, `Sale`. Not required |
-| 7 | `Photo` | File upload | Click **Continue** on Google's notice. Turn on **Allow only specific file types → Image**, **Maximum number of files: 1**, **Maximum file size: 10 MB**. **Required** |
+| 7 | `Photo` | File upload | Click **Continue** on Google's notice. Turn on **Allow only specific file types → Image**, **Maximum number of files: 5**, **Maximum file size: 10 MB**. **Required** |
+| 8 | `Colours (separate with commas)` | Short answer | not required. In the description write: *e.g. White, Black, Orange. Upload one photo per colour in the same order, or one photo showing all colours* |
 
 5. **Optional, recommended:** add a security code so that only the owner can add products,
    even if someone gets hold of the form link:
-   - Add question **8**: `Shop code`, type Short answer, **Required**.
+   - Add question **9**: `Shop code`, type Short answer, **Required**.
    - Click **⋮ → Response validation → Regular expression → Matches** and type a secret
      word, e.g. `^abicee2468$` (keep the `^` and `$`).
    - In the "Custom error text" box type: *Wrong code*.

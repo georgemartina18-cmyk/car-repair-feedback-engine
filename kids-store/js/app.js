@@ -51,9 +51,53 @@
   $$("#nav a").forEach((a) => a.addEventListener("click", () => $("#nav").classList.remove("open")));
 
   // ---------- Products ----------
-  const thumb = (p) => p.image
-    ? `<img src="${esc(p.image)}" alt="${esc(p.name)}" loading="lazy" onerror="this.replaceWith('${CATEGORY[p.category].icon}')">`
-    : CATEGORY[p.category].icon;
+  // A photo that fails to load is swapped for the category icon.
+  window.imgFail = (img) => {
+    const s = document.createElement("span");
+    s.className = "img-fallback";
+    s.textContent = img.dataset.icon;
+    img.replaceWith(s);
+  };
+  const photo = (p, src, alt) =>
+    `<img src="${esc(src)}" alt="${esc(alt)}" loading="lazy" data-icon="${CATEGORY[p.category].icon}" onerror="imgFail(this)">`;
+  const thumb = (p) => p.image ? photo(p, p.image, p.name) : CATEGORY[p.category].icon;
+
+  // Colour names the owner types (e.g. "Baby pink") -> a swatch colour, or null for text-only.
+  const SWATCH = { cream: "#fff3d6", navy: "#1f2a5a", "navy blue": "#1f2a5a", wine: "#7b1e3a", maroon: "#800000",
+    "baby pink": "#f9c6d3", "baby blue": "#a7d3f5", "sky blue": "#87ceeb", "army green": "#4b5320", ash: "#b2b2b2",
+    mustard: "#e1ad01", peach: "#ffcba4", nude: "#e3bc9a", "off white": "#f6f1e7", "light blue": "#add8e6",
+    "dark blue": "#00308f", "light pink": "#ffb6c1", "hot pink": "#ff69b4", "lemon": "#fff44f", "grey": "#9e9e9e" };
+  const swatchColor = (name) => {
+    const n = name.trim().toLowerCase();
+    if (SWATCH[n]) return SWATCH[n];
+    const compact = n.replace(/\s+/g, "");
+    return window.CSS && CSS.supports("color", compact) ? compact : null;
+  };
+  const variantLabel = (i) => [i.size, i.color].filter(Boolean).join(" · ");
+
+  function gallery(p) {
+    const imgs = p.images && p.images.length ? p.images : (p.image ? [p.image] : []);
+    if (!imgs.length) return CATEGORY[p.category].icon;
+    return `<div class="gallery" data-gallery="${p.id}">${imgs.map((src, n) => photo(p, src, `${p.name} – photo ${n + 1}`)).join("")}</div>
+      ${imgs.length > 1 ? `
+        <button class="gal-btn gal-prev" data-gal="${p.id}" data-dir="-1" aria-label="Previous photo">‹</button>
+        <button class="gal-btn gal-next" data-gal="${p.id}" data-dir="1" aria-label="Next photo">›</button>
+        <div class="gal-dots" data-dots="${p.id}">${imgs.map((_, n) => `<i class="${n ? "" : "on"}"></i>`).join("")}</div>` : ""}`;
+  }
+
+  function colourPicker(p) {
+    const colors = p.colors || [];
+    if (!colors.length) return "";
+    if (colors.length === 1) return `<span class="product__sizes">Colour: ${esc(colors[0])}</span>`;
+    return `<div class="colors" data-colors="${p.id}" role="radiogroup" aria-label="Choose colour">
+        ${colors.map((c, n) => {
+          const sw = swatchColor(c);
+          return `<button type="button" class="swatch${sw ? "" : " swatch--text"}${n ? "" : " is-on"}" data-color="${esc(c)}" data-idx="${n}"
+            title="${esc(c)}" aria-label="${esc(c)}" role="radio" aria-checked="${n ? "false" : "true"}">${sw ? `<span style="background:${sw}"></span>` : esc(c)}</button>`;
+        }).join("")}
+      </div>
+      <span class="color-name" data-colorname="${p.id}">Colour: <b>${esc(colors[0])}</b></span>`;
+  }
 
   function render(filter) {
     const list = filter === "all" ? products : products.filter((p) => p.category === filter);
@@ -65,7 +109,7 @@
       : list.map((p) => `
       <article class="product">
         <div class="product__img" style="background:${CATEGORY[p.category].bg}">
-          ${thumb(p)}
+          ${gallery(p)}
           ${p.soldOut ? `<span class="badge badge--Sold">Sold out</span>`
             : p.badge ? `<span class="badge badge--${p.badge}">${p.badge}</span>` : ""}
         </div>
@@ -75,6 +119,7 @@
           ${p.sizes.length > 1
             ? `<select class="size" id="size-${p.id}" aria-label="Choose size">${p.sizes.map((s) => `<option>${esc(s)}</option>`).join("")}</select>`
             : `<span class="product__sizes">${esc(p.sizes[0])}</span>`}
+          ${colourPicker(p)}
           <div class="product__row">
             <span class="price">${money(p.price)}${p.oldPrice ? `<s>${money(p.oldPrice)}</s>` : ""}</span>
             ${p.soldOut
@@ -96,7 +141,7 @@
   }));
 
   // ---------- Cart ----------
-  // Each line is { id, size, qty }; the same product in two sizes is two lines.
+  // Each line is { id, size, color, qty }; each size/colour combination is its own line.
   let cart = [];
   try { cart = JSON.parse(localStorage.getItem("cart") || "[]"); } catch (e) { cart = []; }
 
@@ -132,7 +177,7 @@
           <div class="cart-item__img" style="background:${CATEGORY[p.category].bg}">${thumb(p)}</div>
           <div>
             <h4>${esc(p.name)}</h4>
-            <small>${money(p.price)} · ${esc(i.size)}</small>
+            <small>${money(p.price)} · ${esc(variantLabel(i))}</small>
             <div class="qty">
               <button data-dec="${n}" aria-label="Decrease">−</button>
               <span>${i.qty}</span>
@@ -152,8 +197,10 @@
       const p = find(t.dataset.id);
       const sel = document.getElementById(`size-${p.id}`);
       const size = sel ? sel.value : p.sizes[0];
-      const item = cart.find((i) => i.id === p.id && i.size === size);
-      item ? item.qty++ : cart.push({ id: p.id, size, qty: 1 });
+      const on = document.querySelector(`[data-colors="${p.id}"] .is-on`);
+      const color = on ? on.dataset.color : (p.colors && p.colors[0]) || "";
+      const item = cart.find((i) => i.id === p.id && i.size === size && (i.color || "") === color);
+      item ? item.qty++ : cart.push({ id: p.id, size, color, qty: 1 });
       renderCart();
       toast(`Added to your bag ✓`);
     } else if (t.dataset.inc) {
@@ -178,6 +225,70 @@
   $("#overlay").addEventListener("click", closeCart);
   $("#zoneSelect").addEventListener("change", renderCart);
   $("#orderForm").addEventListener("input", (e) => e.target.classList.remove("invalid"));
+
+  // ---------- Photo galleries, colour picker & full-size viewer ----------
+  const galleryEl = (id) => document.querySelector(`[data-gallery="${id}"]`);
+  const scrollGallery = (g, n) => g && g.scrollTo({ left: n * g.clientWidth, behavior: "smooth" });
+
+  document.addEventListener("scroll", (e) => {
+    const g = e.target;
+    if (!g.dataset || !g.dataset.gallery) return;
+    const n = Math.round(g.scrollLeft / g.clientWidth);
+    const dots = document.querySelector(`[data-dots="${g.dataset.gallery}"]`);
+    if (dots) [...dots.children].forEach((d, k) => d.classList.toggle("on", k === n));
+  }, true);
+
+  const lb = { el: $("#lightbox"), img: $("#lbImg"), count: $("#lbCount"), list: [], n: 0, name: "" };
+  function lbShow(n) {
+    lb.n = (n + lb.list.length) % lb.list.length;
+    lb.img.src = lb.list[lb.n].replace(/sz=w\d+/, "sz=w1600");
+    lb.img.alt = `${lb.name} – photo ${lb.n + 1}`;
+    lb.count.textContent = lb.list.length > 1 ? `${lb.n + 1} / ${lb.list.length}` : "";
+    lb.el.classList.toggle("lightbox--single", lb.list.length < 2);
+  }
+  function lbOpen(p, n) {
+    lb.list = p.images && p.images.length ? p.images : [p.image];
+    lb.name = p.name;
+    lbShow(n);
+    lb.el.hidden = false;
+    document.body.classList.add("lb-open");
+  }
+  function lbClose() { lb.el.hidden = true; document.body.classList.remove("lb-open"); }
+  lb.el.addEventListener("click", (e) => {
+    if (e.target.closest(".lb-prev")) lbShow(lb.n - 1);
+    else if (e.target.closest(".lb-next")) lbShow(lb.n + 1);
+    else if (e.target === lb.el || e.target.closest(".lb-close")) lbClose();
+  });
+  document.addEventListener("keydown", (e) => {
+    if (lb.el.hidden) return;
+    if (e.key === "Escape") lbClose();
+    if (e.key === "ArrowLeft") lbShow(lb.n - 1);
+    if (e.key === "ArrowRight") lbShow(lb.n + 1);
+  });
+
+  $("#productGrid").addEventListener("click", (e) => {
+    const nav = e.target.closest(".gal-btn");
+    if (nav) {
+      const g = galleryEl(nav.dataset.gal);
+      const n = Math.round(g.scrollLeft / g.clientWidth) + Number(nav.dataset.dir);
+      scrollGallery(g, (n + g.children.length) % g.children.length);
+      return;
+    }
+    const img = e.target.closest(".gallery img");
+    if (img) {
+      const g = img.parentElement;
+      lbOpen(find(g.dataset.gallery), [...g.children].indexOf(img));
+      return;
+    }
+    const sw = e.target.closest(".swatch");
+    if (sw) {
+      const box = sw.parentElement, id = box.dataset.colors, p = find(id);
+      box.querySelectorAll(".swatch").forEach((b) => { b.classList.toggle("is-on", b === sw); b.setAttribute("aria-checked", b === sw); });
+      document.querySelector(`[data-colorname="${id}"]`).innerHTML = `Colour: <b>${esc(sw.dataset.color)}</b>`;
+      // When there is one photo per colour (same order), show the matching photo.
+      if (p.images && p.images.length === p.colors.length) scrollGallery(galleryEl(id), Number(sw.dataset.idx));
+    }
+  });
 
   // ---------- Checkout (on the website or via WhatsApp) ----------
   const form = $("#orderForm");
@@ -211,7 +322,7 @@
     return {
       items: cart.map((i) => {
         const p = find(i.id);
-        return { name: p.name, size: i.size, qty: i.qty, price: p.price, lineTotal: p.price * i.qty };
+        return { name: p.name, size: variantLabel(i), qty: i.qty, price: p.price, lineTotal: p.price * i.qty };
       }),
       zone: z.zone,
       subtotal: subtotal(),

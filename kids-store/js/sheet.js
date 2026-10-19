@@ -5,7 +5,7 @@
 
    Columns are matched by their header text, so the order of
    columns in the sheet doesn't matter:
-     Product name | Category | Price | Old price | Sizes | Badge | Photo | Status
+     Product name | Category | Price | Old price | Sizes | Colours | Badge | Photo(s) | Status
    Status: leave empty to show, "Sold out" to show as sold out,
            "Hide" (or "No") to remove it from the website.
    ========================================================= */
@@ -33,12 +33,12 @@ const ProductSource = (function () {
     return rows.filter((r) => r.some((v) => v.trim()));
   }
 
-  // Google Drive share links -> a resized, embeddable image URL.
-  function photoUrl(value) {
-    const first = (value || "").split(/[,\s]+/).find(Boolean) || "";
-    const m = first.match(/(?:id=|\/d\/)([\w-]{20,})/);
-    if (m && /google\.com/.test(first)) return `https://drive.google.com/thumbnail?id=${m[1]}&sz=w800`;
-    return first;
+  // Google Drive share links -> resized, embeddable image URLs (one per uploaded photo).
+  function photoUrls(value) {
+    return (value || "").split(/[,\s]+/).filter(Boolean).map((link) => {
+      const m = link.match(/(?:id=|\/d\/)([\w-]{20,})/);
+      return m && /google\.com/.test(link) ? `https://drive.google.com/thumbnail?id=${m[1]}&sz=w800` : link;
+    });
   }
 
   const num = (v) => {
@@ -64,6 +64,7 @@ const ProductSource = (function () {
       sizes:  col((h) => h.includes("size")),
       badge:  col((h) => h.includes("badge") || h.includes("label")),
       photo:  col((h) => h.includes("photo") || h.includes("image") || h.includes("picture")),
+      colors: col((h) => h.includes("colo")),
       status: col((h) => h.includes("status") || h === "show"),
     };
     if (c.name < 0 || c.price < 0) throw new Error("Sheet needs 'Product name' and 'Price' columns");
@@ -81,13 +82,14 @@ const ProductSource = (function () {
         oldPrice: num(get(r, c.old)) || undefined,
         sizes: get(r, c.sizes).split(",").map((s) => s.trim()).filter(Boolean),
         badge: /^(new|hot|sale)$/i.test(badge) ? badge[0].toUpperCase() + badge.slice(1).toLowerCase() : "",
-        image: photoUrl(get(r, c.photo)),
+        images: photoUrls(get(r, c.photo)),
+        colors: get(r, c.colors).split(",").map((s) => s.trim()).filter(Boolean),
         soldOut: status.includes("sold"),
         hidden: /^(hide|hidden|no)$/.test(status),
       };
     })
       .filter((p) => p.name && p.price && !p.hidden)
-      .map((p) => (p.sizes.length ? p : { ...p, sizes: ["One size"] }))
+      .map((p) => ({ ...p, image: p.images[0] || "", sizes: p.sizes.length ? p.sizes : ["One size"] }))
       .reverse(); // newest submissions first
   }
 
