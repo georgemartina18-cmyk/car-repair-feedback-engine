@@ -1,0 +1,97 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import WhatsAppFloat from '../components/WhatsAppFloat.astro';
+import { getCategories, getSettings } from '../lib/store';
+
+interface Props {
+  /** Shown in the browser tab and on Google. Keep it under ~60 characters. */
+  title?: string;
+  /** Shown under the title on Google and in WhatsApp link previews. ~150 characters. */
+  description?: string;
+  /** Picture shown when the link is shared on WhatsApp / Instagram / Facebook. */
+  image?: string;
+  /** Hide this page from Google (admin, cart, checkout). */
+  noindex?: boolean;
+  /** Extra structured data for Google (e.g. a Product). */
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+  type?: 'website' | 'product';
+}
+
+const [settings, categories] = await Promise.all([getSettings(), getCategories()]);
+
+const {
+  title,
+  description = 'Buy 100% genuine iPhones, Samsung, Tecno and Infinix phones, laptops, AirPods and accessories in Computer Village, Ikeja. Nationwide delivery, warranty and pay on delivery in Lagos.',
+  image = '/og-default.jpg',
+  noindex = false,
+  jsonLd,
+  type = 'website',
+} = Astro.props;
+
+const fullTitle = title ? `${title} | ${settings.store_name}` : `${settings.store_name}: Phones, Laptops & Gadgets in Computer Village, Ikeja`;
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const ogImage = new URL(image, Astro.site).href;
+
+// Tells Google this is a real shop with an address and opening hours.
+const storeLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ElectronicsStore',
+  name: settings.store_name,
+  url: Astro.site?.href,
+  image: ogImage,
+  telephone: settings.phone,
+  email: settings.email,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: '5 Otigba Street, Computer Village',
+    addressLocality: 'Ikeja',
+    addressRegion: 'Lagos',
+    addressCountry: 'NG',
+  },
+  openingHoursSpecification: {
+    '@type': 'OpeningHoursSpecification',
+    dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+    opens: '09:00',
+    closes: '19:00',
+  },
+  sameAs: [`https://instagram.com/${settings.instagram}`, `https://www.tiktok.com/@${settings.tiktok}`],
+};
+const ldBlocks = [storeLd, ...(jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [])];
+---
+
+<!doctype html>
+<html lang="en-NG">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+    <meta name="theme-color" content="#0b1220" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <meta property="og:type" content={type} />
+    <meta property="og:site_name" content={settings.store_name} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:locale" content="en_NG" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    {ldBlocks.map((block) => <script type="application/ld+json" set:html={JSON.stringify(block)} />)}
+  </head>
+  <body class="flex min-h-dvh flex-col">
+    <a href="#main" class="sr-only z-50 rounded-lg bg-brand px-4 py-2 text-white focus:not-sr-only focus:fixed focus:top-2 focus:left-2">Skip to content</a>
+    <Header settings={settings} categories={categories} />
+    <main id="main" class="flex-1">
+      <slot />
+    </main>
+    <Footer settings={settings} categories={categories} />
+    <WhatsAppFloat whatsapp={settings.whatsapp} />
+  </body>
+</html>

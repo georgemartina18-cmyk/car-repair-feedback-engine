@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+<defs>
+<linearGradient id="body" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#475569"/><stop offset="1" stop-color="#1e293b"/></linearGradient>
+<linearGradient id="screen" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0b1220"/><stop offset=".55" stop-color="#1e3a8a"/><stop offset="1" stop-color="#475569"/></linearGradient>
+<radialGradient id="glow" cx=".5" cy=".45" r=".5"><stop offset="0" stop-color="#475569" stop-opacity=".35"/><stop offset="1" stop-color="#475569" stop-opacity="0"/></radialGradient>
+</defs>
+<rect width="400" height="400" fill="#f5f7fa"/>
+<circle cx="200" cy="190" r="170" fill="url(#glow)"/>
+<rect x="120" y="70" width="160" height="260" rx="24" fill="url(#body)"/>
+<rect x="185" y="100" width="30" height="8" rx="4" fill="#fff" opacity=".8"/>
+<circle cx="200" cy="290" r="6" fill="#22c55e"/>
+<rect x="122" y="358" width="156" height="24" rx="12" fill="#fff" stroke="#e5e7eb"/>
+<text x="200" y="374" font-family="Arial,Helvetica,sans-serif" font-size="11" font-weight="700" fill="#5b6475" text-anchor="middle" letter-spacing="1.5">SAMPLE IMAGE</text>
+<title>Oraimo Traveler 20000mAh Power Bank</title>
+</svg>

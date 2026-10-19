@@ -1,0 +1,7 @@
+User-agent: *
+Disallow: /admin
+Disallow: /api/
+Disallow: /cart
+Disallow: /checkout
+
+Sitemap: https://gadgetstorelagos.com/sitemap.xml

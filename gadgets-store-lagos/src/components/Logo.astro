@@ -1,0 +1,17 @@
+---
+// PLACEHOLDER LOGO. To use a real logo later: put the file in /public
+// (e.g. /public/logo.svg) and replace everything below with:
+//   <img src="/logo.svg" alt="Gadgets Store in Lagos" width="160" height="40" />
+interface Props {
+  dark?: boolean; // true when shown on a dark background
+}
+const { dark = false } = Astro.props;
+---
+
+<span class="inline-flex items-center gap-2.5">
+  <span class="grid size-9 shrink-0 place-items-center rounded-xl bg-brand font-display text-lg font-extrabold text-white" aria-hidden="true">G</span>
+  <span class="flex flex-col leading-none">
+    <span class:list={['font-display text-[1.05rem] font-extrabold tracking-tight', dark ? 'text-white' : 'text-ink']}>Gadgets Store</span>
+    <span class:list={['mt-0.5 text-[0.7rem] font-semibold tracking-[0.18em] uppercase', dark ? 'text-brand-100' : 'text-brand']}>in Lagos</span>
+  </span>
+</span>

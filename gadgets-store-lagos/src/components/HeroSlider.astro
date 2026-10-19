@@ -1,0 +1,89 @@
+---
+import Icon from './Icon.astro';
+import type { Banner } from '../lib/types';
+
+interface Props {
+  banners: Banner[];
+}
+const { banners } = Astro.props;
+
+const themes: Record<Banner['theme'], { bg: string; text: string; sub: string; btn: string }> = {
+  dark: { bg: 'bg-[radial-gradient(120%_120%_at_80%_20%,#1e3a8a_0%,#0b1220_55%)]', text: 'text-white', sub: 'text-white/75', btn: 'btn-primary' },
+  blue: { bg: 'bg-[linear-gradient(120deg,#1d4ed8,#2563eb_50%,#60a5fa)]', text: 'text-white', sub: 'text-white/85', btn: 'bg-white text-ink hover:bg-brand-50' },
+  deal: { bg: 'bg-[linear-gradient(120deg,#fde68a,#fbbf24_55%,#f59e0b)]', text: 'text-ink', sub: 'text-ink/80', btn: 'btn-dark' },
+};
+---
+
+{
+  banners.length > 0 && (
+    <section aria-roledescription="carousel" aria-label="Promotions" class="relative" data-slider>
+      <div class="flex snap-x snap-mandatory overflow-x-auto rounded-2xl [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" data-track>
+        {banners.map((b, i) => {
+          const t = themes[b.theme] ?? themes.dark;
+          return (
+            <div class:list={['relative w-full shrink-0 snap-start overflow-hidden', t.bg]} role="group" aria-roledescription="slide" aria-label={`${i + 1} of ${banners.length}`}>
+              <div class="grid min-h-[13.5rem] grid-cols-[1.3fr_1fr] items-center gap-2 px-5 py-6 sm:min-h-[18rem] sm:px-10 lg:min-h-[22rem] lg:px-14">
+                <div class="relative z-10">
+                  <h2 class:list={['text-[1.4rem] leading-tight font-extrabold sm:text-4xl lg:text-5xl', t.text]}>{b.title}</h2>
+                  <p class:list={['mt-2 max-w-md text-sm sm:mt-3 sm:text-base lg:text-lg', t.sub]}>{b.subtitle}</p>
+                  <a href={b.cta_link} class:list={['btn mt-4 min-h-11 px-4 text-sm sm:mt-6 sm:min-h-12 sm:px-5 sm:text-base', t.btn]}>
+                    {b.cta_label}
+                    <Icon name="arrowRight" class="size-4" />
+                  </a>
+                </div>
+                <img src={b.image} alt="" width="400" height="400" loading={i === 0 ? 'eager' : 'lazy'} fetchpriority={i === 0 ? 'high' : 'auto'} decoding="async" class="mx-auto max-h-44 w-full object-contain drop-shadow-2xl sm:max-h-64 lg:max-h-80" />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {banners.length > 1 && (
+        <div class="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5" data-dots>
+          {banners.map((_, i) => (
+            <button type="button" class="h-2 w-2 rounded-full bg-white/60 transition-all aria-[current=true]:w-6 aria-[current=true]:bg-white" aria-label={`Go to slide ${i + 1}`} aria-current={i === 0 ? 'true' : 'false'} data-dot={i} />
+          ))}
+        </div>
+      )}
+    </section>
+  )
+}
+
+<script>
+  // Swipe works on its own (CSS scroll-snap). This only adds the dots and auto-play.
+  document.querySelectorAll<HTMLElement>('[data-slider]').forEach((slider) => {
+    const track = slider.querySelector<HTMLElement>('[data-track]')!;
+    const dots = [...slider.querySelectorAll<HTMLButtonElement>('[data-dot]')];
+    if (dots.length < 2) return;
+    let index = 0;
+    let paused = false;
+
+    const go = (i: number) => {
+      index = (i + dots.length) % dots.length;
+      track.scrollTo({ left: track.clientWidth * index, behavior: 'smooth' });
+    };
+    dots.forEach((d, i) => d.addEventListener('click', () => go(i)));
+
+    track.addEventListener(
+      'scroll',
+      () => {
+        index = Math.round(track.scrollLeft / track.clientWidth);
+        dots.forEach((d, i) => d.setAttribute('aria-current', String(i === index)));
+      },
+      { passive: true },
+    );
+
+    const pause = () => (paused = true);
+    track.addEventListener('pointerdown', pause, { passive: true });
+    track.addEventListener('touchstart', pause, { passive: true });
+    slider.addEventListener('mouseenter', pause);
+    slider.addEventListener('mouseleave', () => (paused = false));
+    slider.addEventListener('focusin', pause);
+
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setInterval(() => {
+        if (!paused && !document.hidden) go(index + 1);
+      }, 5500);
+    }
+  });
+</script>

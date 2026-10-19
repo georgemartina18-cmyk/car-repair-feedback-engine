@@ -1,0 +1,165 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import HeroSlider from '../components/HeroSlider.astro';
+import TrustBadges from '../components/TrustBadges.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import ProductCard from '../components/ProductCard.astro';
+import Icon from '../components/Icon.astro';
+import { getBanners, getBrands, getCategories, getProducts, getSettings } from '../lib/store';
+import { whatsappLink } from '../lib/format';
+
+const [settings, banners, categories, brands, deals, featured, newArrivals] = await Promise.all([
+  getSettings(),
+  getBanners(),
+  getCategories(),
+  getBrands(),
+  getProducts({ onSale: true, sort: 'discount', limit: 8 }),
+  getProducts({ featured: true, limit: 8 }),
+  getProducts({ sort: 'newest', limit: 8 }),
+]);
+
+const brandName = Object.fromEntries(brands.map((b) => [b.slug, b.name]));
+
+// Short-lived browser/CDN caching keeps the homepage fast without showing stale prices for long.
+Astro.response.headers.set('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=600');
+---
+
+<BaseLayout>
+  <div class="container-page space-y-10 pt-4 sm:space-y-14 sm:pt-6">
+    <HeroSlider banners={banners} />
+
+    <TrustBadges />
+
+    <!-- Shop by category -->
+    <section aria-labelledby="cat-title">
+      <SectionHeader id="cat-title" title="Shop by category" />
+      <ul class="grid grid-cols-4 gap-2 sm:gap-3 lg:grid-cols-7">
+        {
+          categories.map((c) => (
+            <li>
+              <a href={`/category/${c.slug}`} class="group flex h-full flex-col items-center gap-2 rounded-xl border border-line bg-white px-1 py-3 text-center transition-colors hover:border-brand hover:bg-brand-50 sm:py-5">
+                <span class="grid size-11 place-items-center rounded-full bg-brand-50 text-brand transition-colors group-hover:bg-brand group-hover:text-white sm:size-14">
+                  <Icon name={c.icon} class="size-5 sm:size-7" />
+                </span>
+                <span class="text-[0.72rem] leading-tight font-semibold text-ink sm:text-sm">{c.name}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <!-- Hot deals -->
+    {
+      deals.length > 0 && (
+        <section aria-labelledby="deals-title" class="rounded-2xl bg-deal-50 px-4 py-6 sm:p-8">
+          <SectionHeader id="deals-title" title="🔥 Hot deals" subtitle="Biggest price drops this week" href="/deals" />
+          <ul class="scroll-row lg:grid lg:grid-cols-4 lg:overflow-visible">
+            {deals.map((p, i) => (
+              <li class="w-[46%] shrink-0 snap-start sm:w-[31%] lg:w-auto">
+                <ProductCard product={p} whatsapp={settings.whatsapp} brandName={brandName[p.brand]} eager={i < 2} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    <!-- Featured -->
+    {
+      featured.length > 0 && (
+        <section aria-labelledby="featured-title">
+          <SectionHeader id="featured-title" title="Featured gadgets" subtitle="Hand-picked best sellers" href="/category/phones" />
+          <ul class="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
+            {featured.map((p) => (
+              <li>
+                <ProductCard product={p} whatsapp={settings.whatsapp} brandName={brandName[p.brand]} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    <!-- Swap banner -->
+    <section class="grid items-center gap-6 overflow-hidden rounded-2xl bg-ink p-6 text-white sm:p-10 md:grid-cols-[1.4fr_1fr]">
+      <div>
+        <p class="badge bg-white/10 text-brand-100">Swap & upgrade</p>
+        <h2 class="mt-3 text-2xl font-extrabold text-white sm:text-3xl">Trade in your old phone for a new one</h2>
+        <p class="mt-2 text-white/75">Tell us what you have and what you want. We'll give you a fair value and you pay only the balance.</p>
+        <div class="mt-5 flex flex-wrap gap-3">
+          <a href="/trade-in" class="btn btn-primary"><Icon name="swap" class="size-5" /> Request a swap</a>
+          <a href={whatsappLink(settings.whatsapp, 'Hello, I want to swap my phone.')} target="_blank" rel="noopener" class="btn border border-white/20 text-white hover:bg-white/10">
+            <Icon name="whatsapp" class="size-5" /> Ask on WhatsApp
+          </a>
+        </div>
+      </div>
+      <ul class="grid grid-cols-3 gap-3 text-center text-sm">
+        <li class="rounded-xl bg-white/5 p-4"><span class="block font-display text-2xl font-extrabold text-white">1</span>Describe your device</li>
+        <li class="rounded-xl bg-white/5 p-4"><span class="block font-display text-2xl font-extrabold text-white">2</span>Get a price</li>
+        <li class="rounded-xl bg-white/5 p-4"><span class="block font-display text-2xl font-extrabold text-white">3</span>Pay the balance</li>
+      </ul>
+    </section>
+
+    <!-- New arrivals -->
+    <section aria-labelledby="new-title">
+      <SectionHeader id="new-title" title="New arrivals" subtitle="Just landed in our store" href="/search?sort=newest" />
+      <ul class="scroll-row lg:grid lg:grid-cols-4 lg:overflow-visible">
+        {
+          newArrivals.map((p) => (
+            <li class="w-[46%] shrink-0 snap-start sm:w-[31%] lg:w-auto">
+              <ProductCard product={p} whatsapp={settings.whatsapp} brandName={brandName[p.brand]} />
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <!-- Brands -->
+    <section aria-labelledby="brands-title">
+      <SectionHeader id="brands-title" title="Top brands" />
+      <ul class="flex flex-wrap gap-2 sm:gap-3">
+        {
+          brands.map((b) => (
+            <li>
+              <a href={`/search?brand=${b.slug}`} class="flex h-12 items-center justify-center rounded-full border border-line bg-white px-5 font-display text-sm font-bold text-ink transition-colors hover:border-ink sm:h-14 sm:px-7 sm:text-base">
+                {b.name}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <!-- Visit store -->
+    <section class="grid gap-6 rounded-2xl border border-line p-6 sm:p-8 md:grid-cols-2 md:items-center">
+      <div>
+        <h2 class="section-title">Visit our store in Computer Village</h2>
+        <p class="mt-2 text-muted">See it, test it and pay in person. Our team will set up your new device for free.</p>
+        <ul class="mt-4 space-y-2 text-sm text-ink">
+          <li class="flex gap-3"><Icon name="mapPin" class="size-5 shrink-0 text-brand" />{settings.address}</li>
+          <li class="flex gap-3"><Icon name="clock" class="size-5 shrink-0 text-brand" />{settings.opening_hours}</li>
+          <li class="flex gap-3"><Icon name="call" class="size-5 shrink-0 text-brand" /><a href={`tel:${settings.phone}`} class="hover:text-brand">{settings.phone}</a></li>
+        </ul>
+        <div class="mt-5 flex flex-wrap gap-3">
+          <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(settings.map_query)}`} target="_blank" rel="noopener" class="btn btn-dark">
+            <Icon name="mapPin" class="size-5" /> Get directions
+          </a>
+          <a href={`tel:${settings.phone}`} class="btn btn-outline"><Icon name="call" class="size-5" /> Call us</a>
+        </div>
+      </div>
+      <a href="/contact" class="relative block aspect-[16/10] overflow-hidden rounded-xl bg-[linear-gradient(135deg,#eff6ff,#dbeafe)]" aria-label="Store location details">
+        <svg viewBox="0 0 320 200" class="absolute inset-0 size-full" aria-hidden="true">
+          <g stroke="#bfdbfe" stroke-width="10" fill="none" stroke-linecap="round">
+            <path d="M-10 60h340M-10 140h340M80-10v220M220-10v220" />
+          </g>
+          <g stroke="#93c5fd" stroke-width="4" fill="none"><path d="M-10 100h340M150-10v220" /></g>
+        </svg>
+        <span class="absolute top-1/2 left-1/2 flex -translate-x-1/2 -translate-y-full flex-col items-center">
+          <span class="rounded-lg bg-ink px-3 py-1.5 text-xs font-semibold whitespace-nowrap text-white shadow-lift">5 Otigba St</span>
+          <Icon name="mapPin" class="size-10 fill-brand text-white" />
+        </span>
+      </a>
+    </section>
+  </div>
+</BaseLayout>

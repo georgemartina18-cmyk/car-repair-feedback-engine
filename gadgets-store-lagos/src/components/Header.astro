@@ -1,0 +1,165 @@
+---
+import Icon from './Icon.astro';
+import Logo from './Logo.astro';
+import type { Category, StoreSettings } from '../lib/types';
+
+interface Props {
+  settings: StoreSettings;
+  categories: Category[];
+}
+const { settings, categories } = Astro.props;
+const path = Astro.url.pathname;
+const query = Astro.url.searchParams.get('q') ?? '';
+---
+
+<div class="bg-ink text-center text-xs font-medium text-white/85 sm:text-[0.8rem]">
+  <p class="container-page truncate py-2">{settings.announcement}</p>
+</div>
+
+<header class="sticky top-0 z-40 border-b border-line bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/85">
+  <div class="container-page flex h-16 items-center gap-3 lg:h-[4.5rem] lg:gap-6">
+    <button type="button" class="-ml-2 grid size-11 place-items-center rounded-lg text-ink lg:hidden" data-menu-open aria-label="Open menu">
+      <Icon name="menu" class="size-6" />
+    </button>
+
+    <a href="/" class="shrink-0" aria-label={`${settings.store_name}, home`}>
+      <Logo />
+    </a>
+
+    <form action="/search" method="get" role="search" class="relative ml-2 hidden flex-1 md:block lg:max-w-xl">
+      <label for="search-desktop" class="sr-only">Search products</label>
+      <input id="search-desktop" name="q" type="search" value={query} placeholder="Search iPhone, MacBook, AirPods…" autocomplete="off" class="input h-11 min-h-11 rounded-full bg-surface pr-12 pl-5" />
+      <button class="absolute top-1/2 right-1.5 grid size-8 -translate-y-1/2 place-items-center rounded-full bg-brand text-white" aria-label="Search">
+        <Icon name="search" class="size-4" />
+      </button>
+    </form>
+
+    <div class="ml-auto flex items-center gap-1 sm:gap-2">
+      <a href={`tel:${settings.phone}`} class="hidden items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-ink hover:bg-surface xl:flex">
+        <Icon name="call" class="size-5 text-brand" />
+        {settings.phone}
+      </a>
+      <a href="/trade-in" class="hidden items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-ink hover:bg-surface lg:flex">
+        <Icon name="swap" class="size-5 text-brand" />
+        Swap
+      </a>
+      <a href="/cart" class="relative grid size-11 place-items-center rounded-lg text-ink hover:bg-surface" aria-label="Cart">
+        <Icon name="cart" class="size-6" />
+        <span data-cart-count class="absolute top-1 right-0.5 hidden min-w-5 rounded-full bg-deal px-1 text-center text-[0.7rem] leading-5 font-bold text-ink">0</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Mobile search -->
+  <form action="/search" method="get" role="search" class="container-page pb-3 md:hidden">
+    <div class="relative">
+      <label for="search-mobile" class="sr-only">Search products</label>
+      <input id="search-mobile" name="q" type="search" value={query} placeholder="Search phones, laptops, accessories…" autocomplete="off" class="input h-11 min-h-11 rounded-full bg-surface pr-12 pl-5" />
+      <button class="absolute top-1/2 right-1.5 grid size-8 -translate-y-1/2 place-items-center rounded-full bg-brand text-white" aria-label="Search">
+        <Icon name="search" class="size-4" />
+      </button>
+    </div>
+  </form>
+
+  <!-- Category links -->
+  <nav aria-label="Categories" class="hidden border-t border-line lg:block">
+    <ul class="container-page flex gap-1 overflow-x-auto py-1 text-sm font-medium">
+      {
+        categories.map((c) => {
+          const href = `/category/${c.slug}`;
+          return (
+            <li>
+              <a href={href} class:list={['flex items-center gap-2 rounded-lg px-3 py-2 whitespace-nowrap hover:bg-surface hover:text-ink', path.startsWith(href) ? 'text-brand' : 'text-body']}>
+                <Icon name={c.icon} class="size-4" />
+                {c.name}
+              </a>
+            </li>
+          );
+        })
+      }
+      <li class="ml-auto">
+        <a href="/deals" class="flex items-center gap-2 rounded-lg px-3 py-2 font-semibold whitespace-nowrap text-deal-text hover:bg-deal-50">
+          <Icon name="tag" class="size-4" /> Deals
+        </a>
+      </li>
+    </ul>
+  </nav>
+</header>
+
+<!-- Mobile menu (native dialog: accessible, almost no JavaScript) -->
+<dialog id="mobile-menu" class="m-0 h-dvh max-h-none w-[86vw] max-w-sm bg-white p-0 backdrop:bg-ink/50 open:animate-[slide-in_.2s_ease-out]" aria-label="Menu">
+  <div class="flex h-full flex-col">
+    <div class="flex h-16 items-center justify-between border-b border-line px-4">
+      <Logo />
+      <button type="button" class="grid size-11 place-items-center rounded-lg" data-menu-close aria-label="Close menu">
+        <Icon name="close" class="size-6" />
+      </button>
+    </div>
+    <nav class="flex-1 overflow-y-auto px-2 py-3" aria-label="Main">
+      <p class="px-3 pb-2 text-xs font-semibold tracking-wider text-muted uppercase">Shop by category</p>
+      <ul>
+        {
+          categories.map((c) => (
+            <li>
+              <a href={`/category/${c.slug}`} class="flex min-h-12 items-center gap-3 rounded-lg px-3 font-medium text-ink hover:bg-surface">
+                <Icon name={c.icon} class="size-5 text-brand" />
+                {c.name}
+                <Icon name="chevronRight" class="ml-auto size-4 text-muted" />
+              </a>
+            </li>
+          ))
+        }
+        <li>
+          <a href="/deals" class="flex min-h-12 items-center gap-3 rounded-lg px-3 font-semibold text-deal-text hover:bg-deal-50">
+            <Icon name="tag" class="size-5" /> Deals
+          </a>
+        </li>
+      </ul>
+      <p class="mt-4 px-3 pb-2 text-xs font-semibold tracking-wider text-muted uppercase">Help</p>
+      <ul class="text-ink">
+        <li><a href="/trade-in" class="flex min-h-12 items-center gap-3 rounded-lg px-3 hover:bg-surface"><Icon name="swap" class="size-5 text-brand" />Swap / trade-in</a></li>
+        <li><a href="/track-order" class="flex min-h-12 items-center gap-3 rounded-lg px-3 hover:bg-surface"><Icon name="truck" class="size-5 text-brand" />Track my order</a></li>
+        <li><a href="/contact" class="flex min-h-12 items-center gap-3 rounded-lg px-3 hover:bg-surface"><Icon name="mapPin" class="size-5 text-brand" />Visit our store</a></li>
+      </ul>
+    </nav>
+    <div class="border-t border-line p-4">
+      <a href={`https://wa.me/${settings.whatsapp}`} class="btn btn-whatsapp w-full" target="_blank" rel="noopener">
+        <Icon name="whatsapp" class="size-5" /> Chat on WhatsApp
+      </a>
+    </div>
+  </div>
+</dialog>
+
+<style>
+  @keyframes slide-in {
+    from {
+      transform: translateX(-100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+</style>
+
+<script>
+  const menu = document.getElementById('mobile-menu') as HTMLDialogElement | null;
+  document.querySelector('[data-menu-open]')?.addEventListener('click', () => menu?.showModal());
+  document.querySelector('[data-menu-close]')?.addEventListener('click', () => menu?.close());
+  // Tap outside the panel closes it
+  menu?.addEventListener('click', (e) => {
+    if (e.target === menu) menu.close();
+  });
+
+  // Cart count badge (the cart itself is built in Phase 3)
+  try {
+    const items = JSON.parse(localStorage.getItem('gsl-cart') || '[]') as { qty: number }[];
+    const count = items.reduce((n, i) => n + (i.qty || 0), 0);
+    const badge = document.querySelector<HTMLElement>('[data-cart-count]');
+    if (badge && count > 0) {
+      badge.textContent = String(count);
+      badge.classList.remove('hidden');
+    }
+  } catch {
+    /* storage unavailable: no badge */
+  }
+</script>

@@ -1,0 +1,122 @@
+---
+import Icon from './Icon.astro';
+import Logo from './Logo.astro';
+import type { Category, StoreSettings } from '../lib/types';
+
+interface Props {
+  settings: StoreSettings;
+  categories: Category[];
+}
+const { settings, categories } = Astro.props;
+const year = new Date().getFullYear();
+
+const help = [
+  ['Track my order', '/track-order'],
+  ['Swap / trade-in', '/trade-in'],
+  ['Delivery information', '/delivery'],
+  ['Warranty & returns', '/warranty'],
+  ['FAQ', '/faq'],
+];
+const company = [
+  ['About us', '/about'],
+  ['Contact & store location', '/contact'],
+  ['Privacy policy', '/privacy'],
+  ['Terms & conditions', '/terms'],
+];
+---
+
+<footer class="mt-16 bg-ink text-white/80">
+  <!-- Newsletter -->
+  <div class="border-b border-white/10">
+    <div class="container-page flex flex-col gap-4 py-8 md:flex-row md:items-center md:justify-between">
+      <div>
+        <h2 class="text-lg font-bold text-white">Get deals before everyone else</h2>
+        <p class="text-sm text-white/70">New arrivals and price drops, about twice a month. No spam.</p>
+      </div>
+      <form method="post" action="/api/newsletter" class="flex w-full gap-2 md:max-w-md" data-newsletter>
+        <label for="newsletter-email" class="sr-only">Email address</label>
+        <input id="newsletter-email" name="email" type="email" required placeholder="Your email address" class="input border-white/15 bg-white/10 text-white placeholder:text-white/60 focus:border-white" />
+        <button class="btn btn-primary shrink-0">Subscribe</button>
+      </form>
+    </div>
+    <p data-newsletter-msg class="container-page hidden pb-6 text-sm font-medium text-green-300" role="status"></p>
+  </div>
+
+  <div class="container-page grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-4">
+    <div class="space-y-4">
+      <Logo dark />
+      <p class="text-sm leading-relaxed text-white/70">{settings.tagline}</p>
+      <div class="flex gap-2">
+        <a href={`https://instagram.com/${settings.instagram}`} target="_blank" rel="noopener" class="grid size-11 place-items-center rounded-lg bg-white/10 hover:bg-white/20">
+          <Icon name="instagram" label="Instagram" />
+        </a>
+        <a href={`https://www.tiktok.com/@${settings.tiktok}`} target="_blank" rel="noopener" class="grid size-11 place-items-center rounded-lg bg-white/10 hover:bg-white/20">
+          <Icon name="tiktok" label="TikTok" />
+        </a>
+        <a href={`https://wa.me/${settings.whatsapp}`} target="_blank" rel="noopener" class="grid size-11 place-items-center rounded-lg bg-white/10 hover:bg-white/20">
+          <Icon name="whatsapp" label="WhatsApp" />
+        </a>
+      </div>
+    </div>
+
+    <div>
+      <h2 class="mb-3 text-sm font-semibold tracking-wider text-white uppercase">Shop</h2>
+      <ul class="space-y-1 text-sm">
+        {categories.map((c) => <li><a class="inline-block py-1.5 hover:text-white" href={`/category/${c.slug}`}>{c.name}</a></li>)}
+      </ul>
+    </div>
+
+    <div>
+      <h2 class="mb-3 text-sm font-semibold tracking-wider text-white uppercase">Help</h2>
+      <ul class="space-y-1 text-sm">
+        {help.map(([label, href]) => <li><a class="inline-block py-1.5 hover:text-white" href={href}>{label}</a></li>)}
+        {company.map(([label, href]) => <li><a class="inline-block py-1.5 hover:text-white" href={href}>{label}</a></li>)}
+      </ul>
+    </div>
+
+    <div>
+      <h2 class="mb-3 text-sm font-semibold tracking-wider text-white uppercase">Visit or call us</h2>
+      <ul class="space-y-3 text-sm">
+        <li class="flex gap-3"><Icon name="mapPin" class="mt-0.5 size-5 shrink-0 text-brand-100" /><span>{settings.address}</span></li>
+        <li class="flex gap-3"><Icon name="clock" class="mt-0.5 size-5 shrink-0 text-brand-100" /><span>{settings.opening_hours}</span></li>
+        <li class="flex gap-3"><Icon name="call" class="mt-0.5 size-5 shrink-0 text-brand-100" /><a class="hover:text-white" href={`tel:${settings.phone}`}>{settings.phone}</a></li>
+        <li class="flex gap-3"><Icon name="mail" class="mt-0.5 size-5 shrink-0 text-brand-100" /><a class="break-all hover:text-white" href={`mailto:${settings.email}`}>{settings.email}</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="border-t border-white/10">
+    <div class="container-page flex flex-col gap-2 py-6 text-xs text-white/60 sm:flex-row sm:items-center sm:justify-between">
+      <p>© {year} {settings.store_name}. All rights reserved.</p>
+      <p>Secure payments by Paystack · Card · Bank transfer · USSD</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Send the newsletter form without leaving the page.
+  const form = document.querySelector<HTMLFormElement>('[data-newsletter]');
+  const msg = document.querySelector<HTMLElement>('[data-newsletter-msg]');
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const button = form.querySelector('button');
+    if (button) button.disabled = true;
+    try {
+      const res = await fetch(form.action, { method: 'POST', body: new FormData(form) });
+      const data = (await res.json()) as { message: string };
+      if (msg) {
+        msg.textContent = data.message;
+        msg.classList.remove('hidden');
+        msg.classList.toggle('text-red-300', !res.ok);
+      }
+      if (res.ok) form.reset();
+    } catch {
+      if (msg) {
+        msg.textContent = 'Network problem. Please try again.';
+        msg.classList.remove('hidden');
+      }
+    } finally {
+      if (button) button.disabled = false;
+    }
+  });
+</script>

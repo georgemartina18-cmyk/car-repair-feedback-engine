@@ -1,0 +1,58 @@
+---
+import Icon from './Icon.astro';
+import { discountPercent, formatNaira, productWhatsappMessage, whatsappLink } from '../lib/format';
+import type { Product } from '../lib/types';
+
+interface Props {
+  product: Product;
+  whatsapp: string;
+  brandName?: string;
+  eager?: boolean; // load the image straight away (use for the first few cards only)
+}
+const { product: p, whatsapp, brandName, eager = false } = Astro.props;
+const off = discountPercent(p.price, p.compare_at_price);
+const href = `/product/${p.slug}`;
+const waHref = whatsappLink(whatsapp, productWhatsappMessage({ name: p.name, price: p.price, url: new URL(href, Astro.site).href }));
+const lowStock = p.stock > 0 && p.stock <= 3;
+---
+
+<article class="group relative flex h-full flex-col overflow-hidden rounded-(--radius-card) border border-line bg-white transition-shadow duration-200 hover:shadow-lift">
+  <div class="relative aspect-square overflow-hidden bg-surface">
+    <img
+      src={p.images[0]}
+      alt={p.name}
+      width="400"
+      height="400"
+      loading={eager ? 'eager' : 'lazy'}
+      fetchpriority={eager ? 'high' : 'auto'}
+      decoding="async"
+      class="size-full object-contain p-3 transition-transform duration-300 group-hover:scale-[1.03]"
+    />
+    <div class="absolute top-2.5 left-2.5 flex flex-col items-start gap-1">
+      {off > 0 && <span class="badge badge-deal">-{off}%</span>}
+      {p.condition !== 'Brand New' && <span class="badge bg-white text-ink">{p.condition}</span>}
+    </div>
+    {p.stock === 0 && <span class="badge badge-out absolute right-2.5 bottom-2.5">Out of stock</span>}
+    {lowStock && <span class="badge absolute right-2.5 bottom-2.5 bg-white text-deal-text">Only {p.stock} left</span>}
+  </div>
+
+  <div class="flex flex-1 flex-col gap-1 p-3 sm:p-4">
+    {brandName && <p class="text-xs font-medium tracking-wide text-muted uppercase">{brandName}</p>}
+    <h3 class="line-clamp-2 font-sans text-sm leading-snug font-semibold text-ink sm:text-[0.95rem]">
+      <a href={href} class="after:absolute after:inset-0 focus-visible:outline-none" data-astro-prefetch>{p.name}</a>
+    </h3>
+    <div class="mt-auto pt-2">
+      <p class="font-display text-base font-bold text-ink sm:text-lg">{formatNaira(p.price)}</p>
+      {off > 0 && <p class="text-xs text-muted line-through">{formatNaira(p.compare_at_price!)}</p>}
+    </div>
+  </div>
+
+  {
+    p.stock > 0 && (
+      <a href={waHref} target="_blank" rel="noopener" class="relative z-10 mx-3 mb-3 flex min-h-10 items-center justify-center gap-1.5 rounded-lg border border-wa/25 bg-green-50 px-1 text-xs font-semibold whitespace-nowrap sm:text-[0.8rem] text-wa hover:bg-green-100 sm:mx-4 sm:mb-4">
+        <Icon name="whatsapp" class="size-4 shrink-0" />
+        <span><span class="sr-only sm:not-sr-only">Order on </span>WhatsApp</span>
+      </a>
+    )
+  }
+</article>

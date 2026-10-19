@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+<defs>
+<linearGradient id="body" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#475569"/><stop offset="1" stop-color="#1e293b"/></linearGradient>
+<linearGradient id="screen" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0b1220"/><stop offset=".55" stop-color="#1e3a8a"/><stop offset="1" stop-color="#475569"/></linearGradient>
+<radialGradient id="glow" cx=".5" cy=".45" r=".5"><stop offset="0" stop-color="#475569" stop-opacity=".35"/><stop offset="1" stop-color="#475569" stop-opacity="0"/></radialGradient>
+</defs>
+<rect width="400" height="400" fill="#f5f7fa"/>
+<circle cx="200" cy="190" r="170" fill="url(#glow)"/>
+<rect x="165" y="40" width="70" height="90" rx="14" fill="#475569"/><rect x="165" y="270" width="70" height="90" rx="14" fill="#475569"/>
+<rect x="135" y="115" width="130" height="170" rx="40" fill="url(#body)"/>
+<rect x="146" y="126" width="108" height="148" rx="30" fill="url(#screen)"/>
+<rect x="266" y="170" width="10" height="34" rx="5" fill="#1e293b"/>
+<rect x="122" y="358" width="156" height="24" rx="12" fill="#fff" stroke="#e5e7eb"/>
+<text x="200" y="374" font-family="Arial,Helvetica,sans-serif" font-size="11" font-weight="700" fill="#5b6475" text-anchor="middle" letter-spacing="1.5">SAMPLE IMAGE</text>
+<title>Oraimo Watch 5</title>
+</svg>
