@@ -44,27 +44,33 @@ function doPost(e) {
       lock.releaseLock();
     }
 
-    MailApp.sendEmail({
-      to: OWNER_EMAIL || Session.getEffectiveUser().getEmail(),
-      subject: `🛍️ New order ${id} — GH₵ ${money(d.total)} from ${clip(d.name, 60)}`,
-      body: [
-        `Order: ${id}`,
-        `Customer: ${clip(d.name, 100)}`,
-        `Phone / WhatsApp: ${clip(d.phone, 30)}`,
-        `Delivery: ${clip(d.zone, 100)} — ${clip(d.area)}`,
-        `Payment: ${clip(d.payment, 60)}`,
-        d.note ? `Note: ${clip(d.note, 500)}` : "",
-        "",
-        items,
-        "",
-        `Subtotal: GH₵ ${money(d.subtotal)}`,
-        `Delivery: GH₵ ${money(d.delivery)}`,
-        `TOTAL: GH₵ ${money(d.total)}`,
-        "",
-        "Call or WhatsApp the customer to confirm stock and payment.",
-        "All orders: open your Google Sheet → Orders tab.",
-      ].filter((l) => l !== null).join("\n"),
-    });
+    // The order is already saved; never fail it because of the email
+    // (free Gmail accounts can send about 100 emails a day).
+    try {
+      MailApp.sendEmail({
+        to: OWNER_EMAIL || Session.getEffectiveUser().getEmail(),
+        subject: `🛍️ New order ${id} — GH₵ ${money(d.total)} from ${clip(d.name, 60)}`,
+        body: [
+          `Order: ${id}`,
+          `Customer: ${clip(d.name, 100)}`,
+          `Phone / WhatsApp: ${clip(d.phone, 30)}`,
+          `Delivery: ${clip(d.zone, 100)} — ${clip(d.area)}`,
+          `Payment: ${clip(d.payment, 60)}`,
+          d.note ? `Note: ${clip(d.note, 500)}` : "",
+          "",
+          items,
+          "",
+          `Subtotal: GH₵ ${money(d.subtotal)}`,
+          `Delivery: GH₵ ${money(d.delivery)}`,
+          `TOTAL: GH₵ ${money(d.total)}`,
+          "",
+          "Call or WhatsApp the customer to confirm stock and payment.",
+          "All orders: open your Google Sheet → Orders tab.",
+        ].filter((l) => l !== null).join("\n"),
+      });
+    } catch (mailErr) {
+      console.warn("Order saved but email not sent: " + mailErr);
+    }
 
     return reply({ ok: true, orderId: id });
   } catch (err) {
